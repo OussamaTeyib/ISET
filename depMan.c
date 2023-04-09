@@ -1,0 +1,241 @@
+/* Departements' Files Manager *
+ * Written by Oussama Teyib    *
+ * April 2023                  */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define check(condition, msg, ...) \
+    if (!(condition)) \
+    { \
+        fprintf(stderr, "%s", msg); \
+        __VA_ARGS__; /* if some instructions must be done like memory deallocation */ \
+        return -1; \
+    } 
+
+typedef struct
+{
+    int ID;
+    char name[21];
+    int coeff;
+    int TP;
+    int mod;
+} Matter;
+
+int main(void)
+{  
+    system("cls");
+    char *temp = malloc(100);
+    printf("Enter the name of the departement: ");
+    fgets(temp, 100, stdin);
+    temp[strlen(temp) - 1] = '\0';
+
+    char *dName = malloc(100);
+    snprintf(dName, 100, "Departements/%s.bin", temp);
+    
+    int choice, again, firstTime = 1; // adding choice must be provided only one time.
+    printf("What do you want:\n");
+    printf("	1. Add a departement\n");
+    printf("	2. Modify a departement\n");
+    printf("	3. Print a departement\n");
+    printf("	0. Exist\n");
+    printf("Enter Your choice: ");
+    do
+    {
+        fflush(stdin);
+        scanf("%d", &choice);
+        if (choice < 0 || choice > 3)
+            printf("ERROR!\nEnter a valid choice [0, 3]: ");
+    } while (choice < 0 || choice > 3);
+
+    while (1)
+    {
+        if (!firstTime)
+        {
+            system("cls");
+            printf("What do you want again:\n");
+            printf("	1. Modify the departement\n");
+            printf("	2. Print the departement\n");
+            printf("	0. Exist\n");
+            printf("Enter Your choice: ");
+            do
+            {
+                fflush(stdin);
+                scanf("%d", &choice);
+                if (choice < 0 || choice > 2)
+                    printf("ERROR!\nEnter a valid choice [0, 2]: ");
+            } while (choice < 0 || choice > 2);
+            if (choice) // must be incresed because adding option is removed.
+                choice++;
+        }
+        firstTime = 0;
+
+        Matter mat;
+        FILE *dep;
+        int nMatters;
+        switch (choice)
+        {
+            case 1: // add a departement          
+                dep = fopen(dName, "wb");
+                check(dep, "Cannot create the file!\n", free(temp), free(dName));
+            
+                int counter = 1;
+                printf("Enter the number of matters: ");
+                fflush(stdin);
+                scanf("%d", &nMatters);
+                fwrite(&nMatters, sizeof nMatters, 1, dep);
+     
+                while (counter <= nMatters)
+                {
+                    mat.ID = counter;
+                    printf("\nEnter the name of the matter #%d: ", mat.ID);
+                    fflush(stdin);
+                    fgets(mat.name, 21, stdin);
+                    mat.name[strlen(mat.name) - 1] = '\0';
+
+                    printf("Enter the coefficient: ");
+                    fflush(stdin);
+                    scanf("%d", &mat.coeff);
+
+                    printf("This matter have TP? (1 or 0): ");
+                    fflush(stdin);
+                    scanf("%d", &mat.TP);
+
+                    printf("Enter the number of module: ");
+                    fflush(stdin);
+                    scanf("%d", &mat.mod);
+
+                    if (1 == fwrite(&mat, sizeof mat, 1, dep))
+                        counter++;
+                }  
+                fclose(dep);  // must be closed in order to use it again!           
+                break;
+
+            case 2: // modify a departement
+                dep = fopen(dName, "rb+");
+                check(dep, "Cannot open the file!\n", free(dName), free(temp));
+
+                int tempID;
+                printf("Enter the ID of the matter: ");
+                fflush(stdin);
+                scanf("%d", &tempID);
+
+                fseek(dep, (long) sizeof(int), SEEK_SET); // skip nMaters;
+                int found = 0;
+                while (1 == fread(&mat, sizeof mat, 1, dep))
+                {
+                    if (tempID == mat.ID)
+                    {
+                        found = 1;
+                        printf("\nMatter #%d\n", mat.ID);
+                        printf("	Name: %s\n", mat.name);
+                        printf("	Coeff: %d\n", mat.coeff);
+                        printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
+                        printf("	Module N%d\n", mat.mod);
+
+                        int tempChoice;
+                        printf("\nWhat do you wanna modifie:\n");
+                        printf("	1. Name\n");
+                        printf("	2. Coeff\n");
+                        printf("	3. TP\n");
+                        printf("	4. Module\n");
+                        printf("	0. Nothing\n");
+                        printf("Enter Your choice: ");
+                        do
+                        {
+                            fflush(stdin);
+                            scanf("%d", &tempChoice);
+                            if (tempChoice < 0 || tempChoice > 4)
+                                printf("ERROR!\nEnter a valid choice [0, 4]: ");
+                        } while (tempChoice < 0 || tempChoice > 4);
+
+                        switch (tempChoice)
+                        {
+                            case 1:
+                                printf("\nEnter the new name: ");
+                                fflush(stdin);
+                                fgets(mat.name, 21, stdin);
+                                mat.name[strlen(mat.name) - 1] = '\0';
+                                break;
+
+                            case 2:
+                                printf("Enter the new coefficient: ");
+                                fflush(stdin);
+                                scanf("%d", &mat.coeff);
+                                break;
+
+                            case 3:
+                                printf("This matter have TP? (1 or 0): ");
+                                fflush(stdin);
+                                scanf("%d", &mat.TP);
+                                break;
+
+                            case 4:
+                                printf("Enter the new number of module: ");
+                                fflush(stdin);
+                                scanf("%d", &mat.mod);
+                                break;
+        
+                            case 0: 
+                                printf("Be sure the next time!\n"); // ;)
+                        }
+                        fseek(dep, - (long) sizeof mat, SEEK_CUR);
+                        fwrite(&mat, sizeof mat, 1, dep);
+                        if(tempChoice)
+                            printf("Done!\n");
+                        break;    
+                    }
+                }
+
+                if (!found)
+                    fprintf(stderr, "The ID is incorrect!\n");
+
+                fclose(dep);        
+                break;
+        
+            case 3: // print the content of a departement
+                dep = fopen(dName, "rb");
+                check(dep, "Cannot open the file!\n", free(dName), free(temp));
+
+                int empty = 1;
+                if (1 == fread(&nMatters, sizeof nMatters, 1, dep) && nMatters)
+                {
+                    empty = 0;
+                    printf("\nNumber of matters in %s is: %d\n", temp, nMatters); 
+                }   
+      
+                while (1 == fread(&mat, sizeof mat, 1, dep))
+                {
+                    printf("\nMatter #%d\n", mat.ID);
+                    printf("	Name: %s\n", mat.name);
+                    printf("	Coeff: %d\n", mat.coeff);
+                    printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
+                    printf("	Module #%d\n", mat.mod);
+                }
+
+                if (empty)
+                    fprintf(stderr, "\nThis file is EMPTY!\n");
+
+                fclose(dep);
+                break;               
+
+            case 0:
+                again = 0;                
+        } 
+        if (choice)
+        {
+	    printf("\nAgain? (1 or 0): ");
+            fflush(stdin);
+            scanf("%d", &again);
+        }
+
+        if (!again)
+        {
+            free(temp);
+            free(dName);
+            printf("\nGood Bye!\n");
+            return 0;
+        } 
+    }      
+}
