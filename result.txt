@@ -1,0 +1,115 @@
+Module #1
+	Coeff: 6
+	Note: 14.03
+	Mention: Valide
+	Nombres des elements: 2
+	Elements:
+
+	Element #1
+		Nom: Francais
+		Coeff: 3
+		TP: Non
+		Module: 1
+		Devoir: 13.00
+		Examen: 12.50
+		Note d'element: 12.70
+
+	Element #2
+		Nom: Economie
+		Coeff: 3
+		TP: Non
+		Module: 1
+		Devoir: 11.75
+		Examen: 17.75
+		Note d'element: 15.35
+--------------------------------------------
+Module #2
+	Coeff: 11
+	Note: 15.75
+	Mention: Valide
+	Nombres des elements: 3
+	Elements:
+
+	Element #3
+		Nom: Dessin Industriel
+		Coeff: 4
+		TP: Oui
+		Module: 2
+		Devoir: 16.25
+		Examen: 17.00
+		TP: 17.00
+		Note d'element: 16.75
+
+	Element #4
+		Nom: Mecanique et RDM
+		Coeff: 4
+		TP: Oui
+		Module: 2
+		Devoir: 12.50
+		Examen: 17.50
+		TP: 18.00
+		Note d'element: 15.92
+
+	Element #5
+		Nom: Procede de Fab.
+		Coeff: 3
+		TP: Oui
+		Module: 2
+		Devoir: 14.00
+		Examen: 13.50
+		TP: 16.75
+		Note d'element: 14.21
+--------------------------------------------
+Module #3
+	Coeff: 7
+	Note: 16.27
+	Mention: Valide
+	Nombres des elements: 2
+	Elements:
+
+	Element #6
+		Nom: Automatismes
+		Coeff: 4
+		TP: Oui
+		Module: 3
+		Devoir: 16.00
+		Examen: 18.00
+		TP: 17.00
+		Note d'element: 17.17
+
+	Element #7
+		Nom: Composants Electro.
+		Coeff: 3
+		TP: Oui
+		Module: 3
+		Devoir: 16.00
+		Examen: 14.50
+		TP: 15.00
+		Note d'element: 15.08
+--------------------------------------------
+Module #4
+	Coeff: 6
+	Note: 17.18
+	Mention: Valide
+	Nombres des elements: 2
+	Elements:
+
+	Element #8
+		Nom: Shemas et Cablage
+		Coeff: 3
+		TP: Oui
+		Module: 4
+		Devoir: 18.50
+		Examen: 15.25
+		TP: 16.00
+		Note d'element: 16.46
+
+	Element #9
+		Nom: Automatique
+		Coeff: 3
+		TP: Non
+		Module: 4
+		Devoir: 20.00
+		Examen: 16.50
+		Note d'element: 17.90
+--------------------------------------------

@@ -1,0 +1,37 @@
+*** this file will be the README, learn how to write it.
+publish the project on github. learn how!
+ask ChatGPT!
+
+the code have resource bin files
+
+first build a version without rsrc merging.
+
+bin files contains the name, the coeff, boolean haveTP, modn(m1, m2, m3), a var for nombres of matiers...
+merge rsrc files with main code exe using gnu windres tool
+
+ADD coeff colon to our output code, i tak about the table (if the space of phone screen is not sufficiant, remove it or ask CHATGPT for portable way).
+
+chatgpt says to read the resources, you must use winpi or an alternative for other os (android = linux), so your code must detect the os it is running on
+
+use only one main code, but there is something you modify beforer compiling to indicate the targeted departement
+for ex: for gab, you modify the main code and set a var to 'gab' and then compile it (you may add this to run program, means it read a value and assign it to the var in main(may be using cmd arguments)), the code now will read the gab.bin file (if you could not write a code for each dep and merge it with its rsrc. but this is similar to our old progs, so no diffrent...)
+
+write a txt that serve as usage manual for the next ossame(how to merge , how to use windress and all necessary things) and write a prog called run to do all of that, (is: compile our prog, use gcc, windress, set departement var).
+ASk chatGPT about run programs, does they exists in real projects how they are called.
+
+to handle the data, that means you will have a struct, (name, coeff, haveTP, dev, tp, caption, exement... bla bla), first vare are set using the bin files
+
+
+every thing is in binary format!! ;)
+
+try to sprit it into diffrent files (eg, one for handling bin files other for calculating) and then merge all the src codes into one exe. (after you merge it with the rsc)
+
+rsc file must be one and contains all of the departementes. (to facilitate merging it. search if we could merge 
+lot of files). 
+
+.exe for windows, as i think. (make alt for android, you can search for an extension for all OSes or you can compile using android if possible(may be clang doesn't have windress), or similate android (linux) compiling on gcc windows (may there is an option in gcc for that, don't forget to add this step if it possible to the man page mentioned above).
+
+a program to handles .bin files (print, modify, remove);
+
+Add an option to our main code for help (usage explanaition, etc). print matiers and coeff if needed. 
+My future dream: build it using the winapi

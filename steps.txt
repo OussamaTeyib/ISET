@@ -1,0 +1,15 @@
+1. Build the depMan
+  - add, modify, print a depertement
+  - add , modify, print matters
+  - check security and memory leaks (SML)
+  - Document it
+
+2. Build depMixer
+  - marge all dep.bin into one
+  - rsrcer it
+  - check SML
+
+3. Build ISET
+  - add dep rsrces in the bottom
+  - read dep depands on the cmd passed
+  - check SML
