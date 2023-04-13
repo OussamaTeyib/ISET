@@ -4,6 +4,10 @@ ask ChatGPT!
 
 the code have resource bin files
 
+in the table
+- strings and nummbers shifted to left
+- add a condition for a module with only one matter
+
 first build a version without rsrc merging.
 
 bin files contains the name, the coeff, boolean haveTP, modn(m1, m2, m3), a var for nombres of matiers...

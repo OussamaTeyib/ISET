@@ -34,6 +34,8 @@ typedef struct {
 } Mod;
 
 int isVowel(char);
+void print(Mod **, int, float);
+void printTable(Mod **, int, float);
 
 int main(int argc, char *argv[])
 {   
@@ -150,11 +152,42 @@ int main(int argc, char *argv[])
     } 
     float moy = totalSum / totalCoeff;
 
+    printTable(mods, nMods, moy);
+
+    // free the memory allocated for the modules
+    for (int i = 0; i < nMods; i++)
+        free(mods[i]);
+
+    return EXIT_SUCCESS;    
+}
+
+int isVowel(char c)
+{
+    switch(c)
+    {
+        case 'a':
+        case 'e':
+        case 'i':
+        case 'o':
+        case 'u':
+        case 'A':
+        case 'E':
+        case 'I':
+        case 'O':
+        case 'U':
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+void print(Mod *mods[], int nMods, float moy)
+{
     FILE *result = fopen("result.txt", "w");
     if (!result)
     {
         fprintf(stderr, "Cannot create the output file!\n");
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
     for (int i = 0; i < nMods; i++)
@@ -181,53 +214,49 @@ int main(int argc, char *argv[])
         fprintf(result, "--------------------------------------------\n");
     }
     fprintf(result, "La moyenne generale est: %5.2f\n", moy);
-
     fclose(result);
-  
-    // free(mods[i].elms); must be done;
-    return 0;    
 }
 
-int isVowel(char c)
+void printTable(Mod *mods[], int nMods, float moy)
 {
-    switch(c)
-    {
-        case 'a':
-        case 'e':
-        case 'i':
-        case 'o':
-        case 'u':
-        case 'A':
-        case 'E':
-        case 'I':
-        case 'O':
-        case 'U':
-            return 1;
-        default:
-            return 0;
-    }
-}
-/*
-void print()
-{
-    FILE *result = fopen("result.bin", "rb");
-    if (!result)
-    {
-        fprintf(stderr, "Cannot open the output file!\n");
-        exit(EXIT_FAILURE);
-    }
+    printf(" _________________________________________________________________________\n");
+    printf("|                     |      |      |     |     |     |      |            |\n");
+    printf("|      Élements       |Devoir|Examen| TP  |Note |Coeff|Module|  Mention   |\n");
+    printf("|_____________________|______|______|_____|_____|_____|______|____________|\n");
+    printf("|                     |      |      |     |     |     |      |            |\n");
 
-    int nMods;
-    fread(&nMods, sizeof nMods, 1, result);
-    Mod mod;
-    Ful
     for (int i = 0; i <nMods; i++)
     {
-        fread(&mod, sizeof mod, 1, result);
-        int nElm = mod.nElm;
-        fseek(result, - (long) sizeof mod
-
-
-
+        for (int j = 0; j < mods[i]->nElm; j++)
+        {
+            printf("|%21s|%6.2f|%6.2f|", mods[i]->elms[j].name, mods[i]->elms[j].dev, mods[i]->elms[j].ex);
+            if (mods[i]->elms[j].isTP)
+                printf("%5.2f|", mods[i]->elms[j].TP);
+            else
+                printf("  -  |");
+            printf("%5.2f|", mods[i]->elms[j].elm);
+            printf("%5d|", mods[i]->elms[j].coeff);
+            if (3 == mods[i]->nElm && j + 1 == 2) 
+                printf("%6.2f|%12s|\n", mods[i]->note, mods[i]->caption? "Valide" : "Non Valide");
+            else
+                printf("      |            |\n");
+            
+            if (j + 1 < mods[i]->nElm)
+            {
+                printf("|---------------------+------+------+-----+-----+-----|");
+                if (2 == mods[i]->nElm)
+                    printf("%6.2f|%12s|\n", mods[i]->note, mods[i]->caption? "Valide" : "Non Valide");
+                else
+                    printf("      |            |\n");
+            }
+            else if (i + 1 < nMods) 
+                printf("|---------------------+------+------+-----+-----+-----+------+------------| \n");
+            else
+                printf("|_____________________|______|______|_____|_____|_____|______|____________|\n");
+        }
     }
-} */
+
+    printf("|                     |                                                   |\n");
+    printf("|       Moyenne       |                     %5.2f                         |\n", moy);
+    printf("|_____________________|___________________________________________________|\n");
+}

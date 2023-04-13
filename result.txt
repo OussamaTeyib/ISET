@@ -1,0 +1,112 @@
+Module #1
+	Coeff: 6
+	Note: 13.00
+	Mention: Non Valide
+	Nombres des elements: 2
+	Elements:
+		Element #1
+			Nom: Francais
+			Coeff: 3
+			TP: Non
+			Module: 1
+			Devoir:  1.00
+			Examen:  1.00
+			Note d'element:  1.00
+
+		Element #2
+			Nom: Economie
+			Coeff: 3
+			TP: Non
+			Module: 1
+			Devoir:  1.00
+			Examen: 41.00
+			Note d'element: 25.00
+--------------------------------------------
+Module #2
+	Coeff: 11
+	Note: 1176.35
+	Mention: Valide
+	Nombres des elements: 3
+	Elements:
+		Element #3
+			Nom: Dessin Industriel
+			Coeff: 4
+			TP: Oui
+			Module: 2
+			Devoir: 15.00
+			Examen: 14.00
+			TP: 14.00
+			Note d'element: 14.33
+
+		Element #4
+			Nom: Mecanique et RDM
+			Coeff: 4
+			TP: Oui
+			Module: 2
+			Devoir: 17.00
+			Examen: 18.00
+			TP: 19181.00
+			Note d'element: 3211.50
+
+		Element #5
+			Nom: Procede de Fab.
+			Coeff: 3
+			TP: Oui
+			Module: 2
+			Devoir: 14.00
+			Examen: 15.00
+			TP:  0.00
+			Note d'element: 12.17
+--------------------------------------------
+Module #3
+	Coeff: 7
+	Note:  0.00
+	Mention: Non Valide
+	Nombres des elements: 2
+	Elements:
+		Element #6
+			Nom: Automatismes
+			Coeff: 4
+			TP: Oui
+			Module: 3
+			Devoir:  0.00
+			Examen:  0.00
+			TP:  0.00
+			Note d'element:  0.00
+
+		Element #7
+			Nom: Composants Electro.
+			Coeff: 3
+			TP: Oui
+			Module: 3
+			Devoir:  0.00
+			Examen:  0.00
+			TP:  0.00
+			Note d'element:  0.00
+--------------------------------------------
+Module #4
+	Coeff: 6
+	Note: 209.02
+	Mention: Non Valide
+	Nombres des elements: 2
+	Elements:
+		Element #8
+			Nom: Shemas et Cablage
+			Coeff: 3
+			TP: Oui
+			Module: 4
+			Devoir:  1.00
+			Examen:  0.00
+			TP: 15.00
+			Note d'element:  2.83
+
+		Element #9
+			Nom: Automatique
+			Coeff: 3
+			TP: Non
+			Module: 4
+			Devoir: 1014.00
+			Examen: 16.00
+			Note d'element: 415.20
+--------------------------------------------
+La moyenne generale est: 475.73
