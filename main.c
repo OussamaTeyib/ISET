@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
+#define MAX 100
+// the struct to be read from the department's file
+typedef struct { 
     int ID;
     char name[21];
     int coeff;
@@ -34,38 +36,49 @@ typedef struct {
 int isVowel(char);
 
 int main(int argc, char *argv[])
-{
-    if (argc != 2)
+{   
+    char *dName = malloc(MAX);  
+    if (argc > 2)
     {
-        fprintf(stderr, "Invalid number of arguments!\n");        
-        fprintf(stderr, "Usage: %s <departement-name>\n", argv[0]);
-        return -1;
+        fprintf(stderr, "Invalid number of arguments!\n");    
+        fprintf(stderr, "Usage: main [departement-name]\n");
+        return EXIT_FAILURE;
     } 
-
-    char *dName = malloc(100);
-    snprintf(dName, 100, "Departements/%s.bin", argv[1]);
+    else if (1 == argc)
+    {
+        char *temp = malloc(MAX);
+        printf("Saisir le nom du departement et le semestre: ");
+        fgets(temp, MAX, stdin);
+        temp[strlen(temp) - 1] = '\0'; 
+        snprintf(dName, MAX, "Departements/%s.bin", temp);
+        free(temp);
+    }
+    else // if the name is passed
+        snprintf(dName, MAX, "Departements/%s.bin", argv[1]);
 
     FILE *dep = fopen(dName, "rb");
     if (!dep)
     {
         fprintf(stderr, "Cannot open the file!\n");
         free(dName);
-        return -1;
+        return EXIT_FAILURE;
     }
-    free(dName);
+
+    free(dName); // we're done with it
 
     int nMatters = 0;
     if(1 != fread(&nMatters, sizeof nMatters, 1, dep) || !nMatters)
     {
         fprintf(stderr, "The file is empty!\n");
         fclose(dep);
-        return -1;
+        return EXIT_FAILURE;
     }
 
     Matter mat;
     FullMatter fmat[nMatters];
     for (int i = 0; i < nMatters; i++)
     {
+        // cpy mat to fmat[i]
         fread(&mat, sizeof mat, 1, dep);
         fmat[i].ID = mat.ID;
         strncpy(fmat[i].name, mat.name, 21);
@@ -87,8 +100,8 @@ int main(int argc, char *argv[])
         else
             fmat[i].elm = (fmat[i].ex * 3 + fmat[i].dev * 2) / 5;
     }
-    fclose(dep);
 
+    fclose(dep); // we're done with it
     int nMods = fmat[nMatters - 1].mod; // the module of last matter is the number of modules in the departement
 
     Mod *mods[nMods];
@@ -98,11 +111,12 @@ int main(int argc, char *argv[])
     {
         int nElm = 0; // count number of elements in this module
         for (int j = i; fmat[j].mod == fmat[i].mod; j++, nElm++);
+        // Allocate memory for nElm of elements
         mods[modCounter] = malloc(sizeof(Mod) + sizeof(FullMatter[nElm]));
 
-        mods[modCounter]->ID = modCounter + 1; // modCounter is an index statrs with 0
         mods[modCounter]->nElm = nElm;
-        mods[modCounter]->coeff = 0; // intialisation
+        mods[modCounter]->ID = modCounter + 1; // '+1' because that modCounter is an index statrs with 0
+        mods[modCounter]->coeff = 0; // just an initialisation
         float tempSum = 0.0f;
         for (int j = i; j < i + mods[modCounter]->nElm; j++)
         {                    
@@ -110,14 +124,28 @@ int main(int argc, char *argv[])
             tempSum += fmat[j].elm * fmat[j].coeff; 
             mods[modCounter]->elms[j - i] = fmat[j];   
         }
+        // note of the module
         mods[modCounter]->note = tempSum / mods[modCounter]->coeff;
-
-        mods[modCounter]->caption = 1; // must be modified
+        // is this module validated?
+        int validated = 0;
+        if (mods[modCounter]->note >= 10)
+        {
+            validated = 1;
+            for (int j = i; j < i + mods[modCounter]->nElm; j++)
+            {
+                if (mods[modCounter]->elms[j - i].elm < 7)
+                {
+                    validated = 0;
+                    break;
+                }
+            }
+        }
+        mods[modCounter]->caption = validated; // must be modified
 
         totalSum += mods[modCounter]->note * mods[modCounter]->coeff;
         totalCoeff += mods[modCounter]->coeff;
 
-        i += mods[modCounter]->nElm;
+        i += mods[modCounter]->nElm; // skip to the next module
         modCounter++;
     } 
     float moy = totalSum / totalCoeff;
@@ -136,33 +164,25 @@ int main(int argc, char *argv[])
         fprintf(result, "	Note: %5.2f\n", mods[i]->note);
         fprintf(result, "	Mention: %s\n", mods[i]->caption? "Valide" : "Non Valide");
         fprintf(result, "	Nombres des elements: %d\n", mods[i]->nElm);
-        fprintf(result, "	Elements:\n");
+        fprintf(result, "	Elements:");
         for (int j = 0; j < mods[i]->nElm; j++)
         {
-            fprintf(result, "\n	Element #%d\n", mods[i]->elms[j].ID);
-            fprintf(result, "		Nom: %s\n", mods[i]->elms[j].name);
-            fprintf(result, "		Coeff: %d\n", mods[i]->elms[j].coeff);
-            fprintf(result, "		TP: %s\n", mods[i]->elms[j].isTP? "Oui" : "Non");
-            fprintf(result, "		Module: %d\n", mods[i]->elms[j].mod);
-            fprintf(result, "		Devoir: %5.2f\n", mods[i]->elms[j].dev);
-            fprintf(result, "		Examen: %5.2f\n", mods[i]->elms[j].ex);
+            fprintf(result, "\n		Element #%d\n", mods[i]->elms[j].ID);
+            fprintf(result, "			Nom: %s\n", mods[i]->elms[j].name);
+            fprintf(result, "			Coeff: %d\n", mods[i]->elms[j].coeff);
+            fprintf(result, "			TP: %s\n", mods[i]->elms[j].isTP? "Oui" : "Non");
+            fprintf(result, "			Module: %d\n", mods[i]->elms[j].mod);
+            fprintf(result, "			Devoir: %5.2f\n", mods[i]->elms[j].dev);
+            fprintf(result, "			Examen: %5.2f\n", mods[i]->elms[j].ex);
             if (mods[i]->elms[j].isTP) 
-                fprintf(result, "		TP: %5.2f\n", mods[i]->elms[j].TP);
-            fprintf(result, "		Note d'element: %5.2f\n", mods[i]->elms[j].elm);
+                fprintf(result, "			TP: %5.2f\n", mods[i]->elms[j].TP);
+            fprintf(result, "			Note d'element: %5.2f\n", mods[i]->elms[j].elm);
         }
         fprintf(result, "--------------------------------------------\n");
     }
+    fprintf(result, "La moyenne generale est: %5.2f\n", moy);
 
     fclose(result);
-    /*
-       
-    fwrite(&nMods, sizeof nMods, 1, result); 
-    for (int i = 0; i < nMods; i++)
-        fwrite(mods[i], sizeof(Mod) + sizeof(FullMatter[mods[i]->nElm]), 1, result);
-    
-    fclose(result); 
-
-    print(); */
   
     // free(mods[i].elms); must be done;
     return 0;    
