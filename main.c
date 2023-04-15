@@ -3,10 +3,12 @@
 #include <string.h>
 
 #define MAX 100
+#define MAX_NAME 21
+#define MAX_CAPTION 10
 // the struct to be read from the department's file
 typedef struct { 
     int ID;
-    char name[21];
+    char name[MAX_NAME];
     int coeff;
     int isTP;
     int mod;
@@ -14,7 +16,7 @@ typedef struct {
 
 typedef struct {
     int ID;
-    char name[21];
+    char name[MAX_NAME];
     int coeff;
     int isTP;
     int mod;
@@ -83,7 +85,7 @@ int main(int argc, char *argv[])
         // cpy mat to fmat[i]
         fread(&mat, sizeof mat, 1, dep);
         fmat[i].ID = mat.ID;
-        strncpy(fmat[i].name, mat.name, 21);
+        strncpy(fmat[i].name, mat.name, MAX_NAME);
         fmat[i].coeff = mat.coeff;
         fmat[i].isTP = mat.isTP;
         fmat[i].mod = mat.mod;
@@ -181,82 +183,74 @@ int isVowel(char c)
     }
 }
 
-void print(Mod *mods[], int nMods, float moy)
+void printTable(Mod *mods[], int nMods, float moy)
 {
-    FILE *result = fopen("result.txt", "w");
+    char *name = malloc(MAX);
+    printf("Saisir un nom pour le ficher: ");
+    fflush(stdin);
+    fgets(name, MAX, stdin);
+    name[strlen(name) - 1] = '\0';
+    
+    char *fName = malloc(MAX);
+    snprintf(fName, MAX, "%s.txt", name); 
+    FILE *result = fopen(fName, "w+");
     if (!result)
     {
         fprintf(stderr, "Cannot create the output file!\n");
+        free(name);
+        free(fName);
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < nMods; i++)
-    {
-        fprintf(result, "Module #%d\n", mods[i]->ID);
-        fprintf(result, "	Coeff: %d\n", mods[i]->coeff);
-        fprintf(result, "	Note: %5.2f\n", mods[i]->note);
-        fprintf(result, "	Mention: %s\n", mods[i]->caption? "Valide" : "Non Valide");
-        fprintf(result, "	Nombres des elements: %d\n", mods[i]->nElm);
-        fprintf(result, "	Elements:");
-        for (int j = 0; j < mods[i]->nElm; j++)
-        {
-            fprintf(result, "\n		Element #%d\n", mods[i]->elms[j].ID);
-            fprintf(result, "			Nom: %s\n", mods[i]->elms[j].name);
-            fprintf(result, "			Coeff: %d\n", mods[i]->elms[j].coeff);
-            fprintf(result, "			TP: %s\n", mods[i]->elms[j].isTP? "Oui" : "Non");
-            fprintf(result, "			Module: %d\n", mods[i]->elms[j].mod);
-            fprintf(result, "			Devoir: %5.2f\n", mods[i]->elms[j].dev);
-            fprintf(result, "			Examen: %5.2f\n", mods[i]->elms[j].ex);
-            if (mods[i]->elms[j].isTP) 
-                fprintf(result, "			TP: %5.2f\n", mods[i]->elms[j].TP);
-            fprintf(result, "			Note d'element: %5.2f\n", mods[i]->elms[j].elm);
-        }
-        fprintf(result, "--------------------------------------------\n");
-    }
-    fprintf(result, "La moyenne generale est: %5.2f\n", moy);
-    fclose(result);
-}
-
-void printTable(Mod *mods[], int nMods, float moy)
-{
-    printf(" _________________________________________________________________________\n");
-    printf("|                     |      |      |     |     |     |      |            |\n");
-    printf("|      Élements       |Devoir|Examen| TP  |Note |Coeff|Module|  Mention   |\n");
-    printf("|_____________________|______|______|_____|_____|_____|______|____________|\n");
-    printf("|                     |      |      |     |     |     |      |            |\n");
+    fprintf(result, " _______________________________________________________________________\n");
+    fprintf(result, "|                     |      |      |     |     |     |      |          |\n");
+    fprintf(result, "|      Élements       |Devoir|Examen| TP  |Note |Coeff|Module|  Mention |\n");
+    fprintf(result, "|_____________________|______|______|_____|_____|_____|______|__________|\n");
+    fprintf(result, "|                     |      |      |     |     |     |      |          |\n");
 
     for (int i = 0; i <nMods; i++)
     {
         for (int j = 0; j < mods[i]->nElm; j++)
         {
-            printf("|%21s|%6.2f|%6.2f|", mods[i]->elms[j].name, mods[i]->elms[j].dev, mods[i]->elms[j].ex);
+            fprintf(result, "|%-*s| %05.2f| %05.2f|", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].dev, mods[i]->elms[j].ex);
             if (mods[i]->elms[j].isTP)
-                printf("%5.2f|", mods[i]->elms[j].TP);
+                fprintf(result, "%05.2f|", mods[i]->elms[j].TP);
             else
-                printf("  -  |");
-            printf("%5.2f|", mods[i]->elms[j].elm);
-            printf("%5d|", mods[i]->elms[j].coeff);
-            if (3 == mods[i]->nElm && j + 1 == 2) 
-                printf("%6.2f|%12s|\n", mods[i]->note, mods[i]->caption? "Valide" : "Non Valide");
+                fprintf(result, "  -  |");
+            fprintf(result, "%05.2f|", mods[i]->elms[j].elm);
+            fprintf(result, "  %d  |", mods[i]->elms[j].coeff);
+            if ((3 == mods[i]->nElm && j + 1 == 2) || 1 == mods[i]->nElm) 
+                fprintf(result, " %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "Validé" : "Non Validé");
             else
-                printf("      |            |\n");
+                fprintf(result, "      |          |\n");
             
             if (j + 1 < mods[i]->nElm)
             {
-                printf("|---------------------+------+------+-----+-----+-----|");
+                fprintf(result, "|---------------------+------+------+-----+-----+-----|");
                 if (2 == mods[i]->nElm)
-                    printf("%6.2f|%12s|\n", mods[i]->note, mods[i]->caption? "Valide" : "Non Valide");
+                    fprintf(result, " %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "Validé" : "Non Validé");
                 else
-                    printf("      |            |\n");
+                    fprintf(result, "      |          |\n");
             }
             else if (i + 1 < nMods) 
-                printf("|---------------------+------+------+-----+-----+-----+------+------------| \n");
+                fprintf(result, "|---------------------+------+------+-----+-----+-----+------+----------| \n");
             else
-                printf("|_____________________|______|______|_____|_____|_____|______|____________|\n");
+                fprintf(result, "|_____________________|______|______|_____|_____|_____|______|__________|\n");
         }
     }
 
-    printf("|                     |                                                   |\n");
-    printf("|       Moyenne       |                     %5.2f                         |\n", moy);
-    printf("|_____________________|___________________________________________________|\n");
+    fprintf(result, "|                     |                                                 |\n");
+    fprintf(result, "|       Moyenne       |                    %05.2f                        |\n", moy);
+    fprintf(result, "|_____________________|_________________________________________________|\n");
+
+    // print the file on the screen
+    system("cls");
+    fseek(result, 0, SEEK_SET);
+    int c;
+    while((c = fgetc(result)) != EOF)
+        putchar(c);
+
+    free(name);
+    free(fName);
+    fclose(result);
 }
