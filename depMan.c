@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_NAME 19
 #define check(condition, msg, ...) \
     if (!(condition)) \
     { \
@@ -17,7 +18,7 @@
 typedef struct
 {
     int ID;
-    char name[21];
+    char name[MAX_NAME];
     int coeff;
     int TP;
     int mod;
@@ -91,7 +92,7 @@ int main(void)
                     mat.ID = counter;
                     printf("\nEnter the name of the matter #%d: ", mat.ID);
                     fflush(stdin);
-                    fgets(mat.name, 21, stdin);
+                    fgets(mat.name, MAX_NAME, stdin);
                     mat.name[strlen(mat.name) - 1] = '\0';
 
                     printf("Enter the coefficient: ");
@@ -155,7 +156,7 @@ int main(void)
                             case 1:
                                 printf("\nEnter the new name: ");
                                 fflush(stdin);
-                                fgets(mat.name, 21, stdin);
+                                fgets(mat.name, MAX_NAME, stdin);
                                 mat.name[strlen(mat.name) - 1] = '\0';
                                 break;
 
