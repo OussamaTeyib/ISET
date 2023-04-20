@@ -41,7 +41,7 @@ void printTable(Mod **, int, float);
 
 int main(int argc, char *argv[])
 {   
-    char *dName = malloc(MAX);  
+    char dName[MAX];  
     if (argc > 2)
     {
         fprintf(stderr, "Invalid number of arguments!\n");    
@@ -50,28 +50,24 @@ int main(int argc, char *argv[])
     } 
     else if (1 == argc)
     {
-        char *temp = malloc(MAX);
+        char temp[MAX];
         printf("Saisir le nom du departement et le semestre: ");
         fgets(temp, MAX, stdin);
         temp[strlen(temp) - 1] = '\0'; 
-        snprintf(dName, MAX, "Departements/%s.bin", temp);
-        free(temp);
+        snprintf(dName, MAX, "../Departements/%s.bin", temp);
     }
     else // if the name is passed
-        snprintf(dName, MAX, "Departements/%s.bin", argv[1]);
+        snprintf(dName, MAX, "../Departements/%s.bin", argv[1]);
 
     FILE *dep = fopen(dName, "rb");
     if (!dep)
     {
         fprintf(stderr, "Cannot open the file!\n");
-        free(dName);
         return EXIT_FAILURE;
     }
 
-    free(dName); // we're done with it
-
-    int nMatters = 0;
-    if(1 != fread(&nMatters, sizeof nMatters, 1, dep) || !nMatters)
+    int nMatters;
+    if (1 != fread(&nMatters, sizeof nMatters, 1, dep))
     {
         fprintf(stderr, "The file is empty!\n");
         fclose(dep);
@@ -111,7 +107,7 @@ int main(int argc, char *argv[])
     Mod *mods[nMods];
     float totalSum = 0.0f;
     int totalCoeff = 0, modCounter = 0;
-    for (int i = 0; i <nMatters;)
+    for (int i = 0; i < nMatters;)
     {
         int nElm = 0; // count number of elements in this module
         for (int j = i; fmat[j].mod == fmat[i].mod; j++, nElm++);
@@ -126,7 +122,7 @@ int main(int argc, char *argv[])
         {                    
             mods[modCounter]->coeff += fmat[j].coeff;
             tempSum += fmat[j].elm * fmat[j].coeff; 
-            mods[modCounter]->elms[j - i] = fmat[j];   
+            mods[modCounter]->elms[j - i] = fmat[j]; // 'j - i' for indexing  
         }
         // note of the module
         mods[modCounter]->note = tempSum / mods[modCounter]->coeff;
@@ -144,7 +140,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        mods[modCounter]->caption = validated; // must be modified
+        mods[modCounter]->caption = validated;
 
         totalSum += mods[modCounter]->note * mods[modCounter]->coeff;
         totalCoeff += mods[modCounter]->coeff;
@@ -185,20 +181,18 @@ int isVowel(char c)
 
 void printTable(Mod *mods[], int nMods, float moy)
 {
-    char *name = malloc(MAX);
+    char name[MAX];
     printf("Saisir un nom pour le ficher: ");
     fflush(stdin);
     fgets(name, MAX, stdin);
     name[strlen(name) - 1] = '\0';
     
-    char *fName = malloc(MAX);
-    snprintf(fName, MAX, "%s.txt", name); 
+    char fName[MAX];
+    snprintf(fName, MAX, "../results/%s.txt", name); 
     FILE *result = fopen(fName, "w+");
     if (!result)
     {
         fprintf(stderr, "Cannot create the output file!\n");
-        free(name);
-        free(fName);
         exit(EXIT_FAILURE);
     }
 
@@ -220,7 +214,7 @@ void printTable(Mod *mods[], int nMods, float moy)
             fprintf(result, "%05.2f|", mods[i]->elms[j].elm);
             fprintf(result, "  %d  |", mods[i]->elms[j].coeff);
             if ((3 == mods[i]->nElm && j + 1 == 2) || 1 == mods[i]->nElm) 
-                fprintf(result, " %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "Validé" : "Non Validé");
+                fprintf(result, " %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
             else
                 fprintf(result, "      |          |\n");
             
@@ -228,7 +222,7 @@ void printTable(Mod *mods[], int nMods, float moy)
             {
                 fprintf(result, "|---------------------+------+------+-----+-----+-----|");
                 if (2 == mods[i]->nElm)
-                    fprintf(result, " %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "Validé" : "Non Validé");
+                    fprintf(result, " %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
                 else
                     fprintf(result, "      |          |\n");
             }
@@ -250,7 +244,5 @@ void printTable(Mod *mods[], int nMods, float moy)
     while((c = fgetc(result)) != EOF)
         putchar(c);
 
-    free(name);
-    free(fName);
     fclose(result);
 }

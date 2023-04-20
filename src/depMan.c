@@ -1,19 +1,19 @@
-/* Departements' Files Manager *
- * Written by Oussama Teyib    *
- * April 2023                  */
+/* Departements' Files Manager
+   Written by Oussama Teyib
+   April 2023
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define MAX 100
+#define MAX_NAME 21
 
-#define MAX_NAME 19
-#define check(condition, msg, ...) \
-    if (!(condition)) \
-    { \
-        fprintf(stderr, "%s", msg); \
-        __VA_ARGS__; /* if some instructions must be done like memory deallocation */ \
-        return -1; \
-    } 
+void die(char *msg)
+{
+    fprintf(stderr, "%s\n", msg);
+    exit(EXIT_FAILURE);
+}
 
 typedef struct
 {
@@ -27,15 +27,15 @@ typedef struct
 int main(void)
 {  
     system("cls");
-    char *temp = malloc(100);
+    char temp[MAX];
     printf("Enter the name of the departement: ");
-    fgets(temp, 100, stdin);
+    fgets(temp, MAX, stdin);
     temp[strlen(temp) - 1] = '\0';
 
-    char *dName = malloc(100);
-    snprintf(dName, 100, "Departements/%s.bin", temp);
+    char dName[MAX];
+    snprintf(dName, MAX, "../Departements/%s.bin", temp);
     
-    int choice, again, firstTime = 1; // adding choice must be provided only one time.
+    int choice, again, firstTime = 1; // 'add' choice must be provided only one time.
     printf("What do you want:\n");
     printf("	1. Add a departement\n");
     printf("	2. Modify a departement\n");
@@ -67,7 +67,7 @@ int main(void)
                 if (choice < 0 || choice > 2)
                     printf("ERROR!\nEnter a valid choice [0, 2]: ");
             } while (choice < 0 || choice > 2);
-            if (choice) // must be incresed because adding option is removed.
+            if (choice) // must be incresed because 'adding' option is removed.
                 choice++;
         }
         firstTime = 0;
@@ -79,14 +79,23 @@ int main(void)
         {
             case 1: // add a departement          
                 dep = fopen(dName, "wb");
-                check(dep, "Cannot create the file!\n", free(temp), free(dName));
+                if(!dep)
+                    die("Cannot create the file!");
             
-                int counter = 1;
                 printf("Enter the number of matters: ");
-                fflush(stdin);
-                scanf("%d", &nMatters);
+                do
+                {
+                    fflush(stdin);
+                    scanf("%d", &nMatters);
+                    if (nMatters < 0)
+                    {
+                        printf("Number of matters can't be less or equal to zero!\n");
+                        printf("Again: ");
+                    }
+                } while(nMatters < 0);
                 fwrite(&nMatters, sizeof nMatters, 1, dep);
      
+                int counter = 1;
                 while (counter <= nMatters)
                 {
                     mat.ID = counter;
@@ -115,7 +124,8 @@ int main(void)
 
             case 2: // modify a departement
                 dep = fopen(dName, "rb+");
-                check(dep, "Cannot open the file!\n", free(dName), free(temp));
+                if (!dep)
+                    die("Cannot open the file!");
 
                 int tempID;
                 printf("Enter the ID of the matter: ");
@@ -133,7 +143,7 @@ int main(void)
                         printf("	Name: %s\n", mat.name);
                         printf("	Coeff: %d\n", mat.coeff);
                         printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
-                        printf("	Module N%d\n", mat.mod);
+                        printf("	Module #%d\n", mat.mod);
 
                         int tempChoice;
                         printf("\nWhat do you wanna modifie:\n");
@@ -197,10 +207,11 @@ int main(void)
         
             case 3: // print the content of a departement
                 dep = fopen(dName, "rb");
-                check(dep, "Cannot open the file!\n", free(dName), free(temp));
+                if (!dep)
+                    die("Cannot open the file!");
 
                 int empty = 1;
-                if (1 == fread(&nMatters, sizeof nMatters, 1, dep) && nMatters)
+                if (1 == fread(&nMatters, sizeof nMatters, 1, dep))
                 {
                     empty = 0;
                     printf("\nNumber of matters in %s is: %d\n", temp, nMatters); 
@@ -233,10 +244,8 @@ int main(void)
 
         if (!again)
         {
-            free(temp);
-            free(dName);
             printf("\nGood Bye!\n");
-            return 0;
+            return EXIT_SUCCESS;
         } 
     }      
 }
