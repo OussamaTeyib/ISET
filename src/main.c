@@ -171,11 +171,13 @@ int isVowel(char c)
         case 'i':
         case 'o':
         case 'u':
+        case 'h':
         case 'A':
         case 'E':
         case 'I':
         case 'O':
         case 'U':
+        case 'H':
             return 1;
         default:
             return 0;
