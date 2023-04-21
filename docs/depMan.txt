@@ -1,4 +1,3 @@
-READMe
 
 DepMan
 This program is used to create a binary file for a departement, to modify the file of a departement or to print all the matters in a departement.
