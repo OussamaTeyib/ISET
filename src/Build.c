@@ -7,7 +7,7 @@
 int main(void)
 {
     // compile depMan.c
-    if (system("gcc src//depMan.c -o bin//depMan"))
+    if (system("gcc src/depMan.c -o bin/depMan"))
     {
         fprintf(stderr, "\nFailed to compile 'depMan.c'!\n");
         return EXIT_FAILURE;
@@ -15,7 +15,7 @@ int main(void)
     printf("'depMan.c' is compiled successfully.\n");
 
     // compile main.c
-    if (system("gcc src//main.c -o bin//main"))
+    if (system("gcc src/main.c -o bin/main"))
     {
         fprintf(stderr, "\nFailed to compile 'main.c'!\n");
         return EXIT_FAILURE;
