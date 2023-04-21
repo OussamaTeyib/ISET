@@ -56,10 +56,10 @@ int main(int argc, char *argv[])
         printf("Saisir le nom du departement et le semestre: ");
         fgets(temp, MAX, stdin);
         temp[strlen(temp) - 1] = '\0'; 
-        snprintf(dName, MAX, "../Departements/%s.bin", temp);
+        snprintf(dName, MAX, "../resources/Departements/%s.bin", temp);
     }
     else // if the name is passed
-        snprintf(dName, MAX, "../Departements/%s.bin", argv[1]);
+        snprintf(dName, MAX, "../resources/Departements/%s.bin", argv[1]);
 
     FILE *dep = fopen(dName, "rb");
     if (!dep)
