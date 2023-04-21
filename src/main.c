@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAX 100
 #define MAX_NAME 21
@@ -36,6 +37,7 @@ typedef struct {
 } Mod;
 
 int isVowel(char);
+char *strlower(char *);
 void print(Mod **, int, float);
 void printTable(Mod **, int, float);
 
@@ -74,6 +76,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    system("cls");
     Matter mat;
     FullMatter fmat[nMatters];
     for (int i = 0; i < nMatters; i++)
@@ -86,7 +89,7 @@ int main(int argc, char *argv[])
         fmat[i].isTP = mat.isTP;
         fmat[i].mod = mat.mod;
    
-        printf("Saisir la note d%s%s\n", (isVowel(fmat[i].name[0])? "'" : "e "), fmat[i].name);
+        printf("Saisir la note d%s%s\n", (isVowel(fmat[i].name[0])? "'" : "e "), strlower(fmat[i].name));
         printf("Devoir: ");
         scanf("%f", &fmat[i].dev);
         printf("Examen: ");
@@ -177,6 +180,19 @@ int isVowel(char c)
         default:
             return 0;
     }
+}
+
+char *strlower(char *str)
+{
+    if (!strlen(str))
+        return NULL;
+
+    char *lowstr = malloc(MAX_NAME);
+    for (int i = 0; i < MAX_NAME; i++)
+        lowstr[i] = tolower(str[i]);
+
+    lowstr[MAX_NAME - 1] = '\0';
+    return lowstr;
 }
 
 void printTable(Mod *mods[], int nMods, float moy)
