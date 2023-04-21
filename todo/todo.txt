@@ -3,6 +3,8 @@ Readme (not yet)
 Publish the project on github (Done)
 
 *** no rsrc version ***
+dael with wchars to accented lettres to it
+
 Add an option to our main code for help (usage explanaition, etc). print matiers and coeff if needed. (write a code that convert a dep.bin into dep documentation)
 
 
