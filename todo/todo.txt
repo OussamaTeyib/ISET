@@ -7,6 +7,7 @@ dael with wchars to accented lettres to it
 
 Add an option to our main code for help (usage explanaition, etc). print matiers and coeff if needed. (write a code that convert a dep.bin into dep documentation)
 
+add validated if moy > 10 and 3 mods are > 10
 
 help option everywhere (at each input)
 
