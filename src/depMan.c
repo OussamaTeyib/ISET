@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define MAX 100
-#define MAX_NAME 21
+#define MAX_NAME 15 // chars only no '\n' nor '\0'
 
 void die(char *msg)
 {
@@ -18,7 +18,10 @@ void die(char *msg)
 typedef struct
 {
     int ID;
-    char name[MAX_NAME];
+    // +1: for the initial '\0' that terminates the string
+    // +1: for '\0' that terminates the string to remove the '\n' (or a char if the input is &gt; the buffer)
+    char name[MAX_NAME + 2];
+    int isProject;
     int coeff;
     int TP;
     int mod;
@@ -33,7 +36,7 @@ int main(void)
     temp[strlen(temp) - 1] = '\0';
 
     char dName[MAX];
-    snprintf(dName, MAX, "../resources/Departements/%s.bin", temp);
+    snprintf(dName, MAX, "../res/Departements/%s.bin", temp);
     
     int choice, again, firstTime = 1; // 'add' choice must be provided only one time.
     printf("What do you want:\n");
@@ -82,35 +85,53 @@ int main(void)
                 if(!dep)
                     die("Cannot create the file!");
             
-                printf("Enter the number of matters: ");
+                printf("Enter the number of matters (includes project): ");
                 do
                 {
                     fflush(stdin);
                     scanf("%d", &nMatters);
                     if (nMatters < 0)
                     {
-                        printf("Number of matters can't be less or equal to zero!\n");
+                        printf("Number of matters can't be less than or equal to zero!\n");
                         printf("Again: ");
                     }
                 } while(nMatters < 0);
-                fwrite(&nMatters, sizeof nMatters, 1, dep);
-     
+
+                fwrite(&nMatters, sizeof nMatters, 1, dep);     
                 int counter = 1;
                 while (counter <= nMatters)
                 {
                     mat.ID = counter;
-                    printf("\nEnter the name of the matter #%d: ", mat.ID);
+                    printf("\nThis is a project? (1/0): ");
                     fflush(stdin);
-                    fgets(mat.name, MAX_NAME, stdin);
-                    mat.name[strlen(mat.name) - 1] = '\0';
+                    scanf("%d", &mat.isProject);
+                    
+                    if (!mat.isProject)
+                    {
+                        printf("Enter the name of the matter #%d: ", mat.ID);
+                        fflush(stdin);
+                        fgets(mat.name, MAX_NAME + 2, stdin);
+                        mat.name[strlen(mat.name) - 1] = '\0';
+                        
+                        printf("Enter the coefficient: ");
+                        fflush(stdin);
+                        scanf("%d", &mat.coeff);
 
-                    printf("Enter the coefficient: ");
-                    fflush(stdin);
-                    scanf("%d", &mat.coeff);
+                        printf("This matter have TP? (1 or 0): ");
+                        fflush(stdin);
+                        scanf("%d", &mat.TP);
+                    }
+                    else
+                    {                        
+                        printf("Enter the name of the Project: ");
+                        fflush(stdin);
+                        fgets(mat.name, MAX_NAME + 2, stdin);
+                        mat.name[strlen(mat.name) - 1] = '\0';
 
-                    printf("This matter have TP? (1 or 0): ");
-                    fflush(stdin);
-                    scanf("%d", &mat.TP);
+                        printf("Enter the coefficient: ");
+                        fflush(stdin);
+                        scanf("%d", &mat.coeff);
+                    }
 
                     printf("Enter the number of module: ");
                     fflush(stdin);
@@ -128,7 +149,7 @@ int main(void)
                     die("Cannot open the file!");
 
                 int tempID;
-                printf("Enter the ID of the matter: ");
+                printf("Enter the ID of the matter (includes the project): ");
                 fflush(stdin);
                 scanf("%d", &tempID);
 
@@ -138,59 +159,141 @@ int main(void)
                 {
                     if (tempID == mat.ID)
                     {
-                        found = 1;
-                        printf("\nMatter #%d\n", mat.ID);
-                        printf("	Name: %s\n", mat.name);
-                        printf("	Coeff: %d\n", mat.coeff);
-                        printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
-                        printf("	Module #%d\n", mat.mod);
-
                         int tempChoice;
-                        printf("\nWhat do you wanna modifie:\n");
-                        printf("	1. Name\n");
-                        printf("	2. Coeff\n");
-                        printf("	3. TP\n");
-                        printf("	4. Module\n");
-                        printf("	0. Nothing\n");
-                        printf("Enter Your choice: ");
-                        do
+                        found = 1;
+                        if (!mat.isProject)
                         {
-                            fflush(stdin);
-                            scanf("%d", &tempChoice);
-                            if (tempChoice < 0 || tempChoice > 4)
-                                printf("ERROR!\nEnter a valid choice [0, 4]: ");
-                        } while (tempChoice < 0 || tempChoice > 4);
-
-                        switch (tempChoice)
-                        {
-                            case 1:
-                                printf("\nEnter the new name: ");
+                            printf("\nMatter #%d\n", mat.ID);
+                            printf("	Name: %s\n", mat.name);
+                            printf("	Coeff: %d\n", mat.coeff);
+                            printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
+                            printf("	Module #%d\n", mat.mod);      
+                            
+                            printf("\nWhat do you wanna modifie:\n");
+                            printf("	1. Name\n");
+                            printf("	2. Coeff\n");
+                            printf("	3. TP\n");
+                            printf("	4. Module\n");
+                            printf("	5. Project\n");
+                            printf("	0. Nothing\n");
+                            printf("Enter Your choice: ");
+                            do
+                            {
                                 fflush(stdin);
-                                fgets(mat.name, MAX_NAME, stdin);
-                                mat.name[strlen(mat.name) - 1] = '\0';
-                                break;
+                                scanf("%d", &tempChoice);
+                                if (tempChoice < 0 || tempChoice > 5)
+                                    printf("ERROR!\nEnter a valid choice [0, 5]: ");
+                            } while (tempChoice < 0 || tempChoice > 5);
+                        
+                            switch (tempChoice)
+                            {
+                                case 1:
+                                    printf("\nEnter the new name: ");
+                                    fflush(stdin);
+                                    fgets(mat.name, MAX_NAME + 2, stdin);
+                                    mat.name[strlen(mat.name) - 1] = '\0';
+                                    break;
 
-                            case 2:
-                                printf("Enter the new coefficient: ");
-                                fflush(stdin);
-                                scanf("%d", &mat.coeff);
-                                break;
+                                case 2:
+                                    printf("Enter the new coefficient: ");
+                                    fflush(stdin);
+                                    scanf("%d", &mat.coeff);
+                                    break;
 
-                            case 3:
-                                printf("This matter have TP? (1 or 0): ");
-                                fflush(stdin);
-                                scanf("%d", &mat.TP);
-                                break;
+                                case 3:
+                                    printf("This matter have TP? (1 or 0): ");
+                                    fflush(stdin);
+                                    scanf("%d", &mat.TP);
+                                    break;
 
-                            case 4:
-                                printf("Enter the new number of module: ");
-                                fflush(stdin);
-                                scanf("%d", &mat.mod);
-                                break;
-        
-                            case 0: 
-                                printf("Be sure the next time!\n"); // ;)
+                                case 4:
+                                    printf("Enter the new number of module: ");
+                                    fflush(stdin);
+                                    scanf("%d", &mat.mod);
+                                    break;
+                            
+                                case 5:
+                                    printf("This is a project? (1/0): ");
+                                    fflush(stdin);
+                                    scanf("%d", &mat.isProject);
+                                    if (mat.isProject)
+                                    {
+                                        printf("Enter the name of the Project: ");
+                                        fflush(stdin);
+                                        fgets(mat.name, MAX_NAME + 2, stdin);
+                                        mat.name[strlen(mat.name) - 1] = '\0';
+
+                                        printf("Enter the coefficient: ");
+                                        fflush(stdin);
+                                        scanf("%d", &mat.coeff);
+                                    }
+                                    break;
+                            
+                                case 0: 
+                                    printf("Be sure the next time!\n"); // ;)
+                            }
                         }
+                        else
+                        {
+                            printf("Project #%d:\n", mat.ID);
+                            printf("	Name: %s\n", mat.name);
+                            printf("	Coeff: %d\n", mat.coeff);
+                            printf("	Module #%d\n", mat.mod);
+                        
+                            printf("\nWhat do you wanna modifie:\n");
+                            printf("	1. Coeff\n");
+                            printf("	2. Module\n");
+                            printf("	3. Project\n");
+                            printf("	0. Nothing\n");
+                            printf("Enter Your choice: ");
+                            do
+                            {
+                                fflush(stdin);
+                                scanf("%d", &tempChoice);
+                                if (tempChoice < 0 || tempChoice > 3)
+                                    printf("ERROR!\nEnter a valid choice [0, 3]: ");
+                            } while (tempChoice < 0 || tempChoice > 3);
+                        
+                            switch (tempChoice)
+                            {
+                                case 1:
+                                    printf("Enter the new coefficient: ");
+                                    fflush(stdin);
+                                    scanf("%d", &mat.coeff);
+                                    break;
+
+                                case 2:
+                                    printf("Enter the new number of module: ");
+                                    fflush(stdin);
+                                    scanf("%d", &mat.mod);
+                                    break;
+                            
+                                case 3:
+                                    printf("This is a project? (1/0): ");
+                                    fflush(stdin);
+                                    scanf("%d", &mat.isProject);
+                                    if (!mat.isProject)
+                                    {
+                                        printf("Enter the name of the matter #%d: ", mat.ID);
+                                        fflush(stdin);
+                                        fgets(mat.name, MAX_NAME + 2, stdin);
+                                        mat.name[strlen(mat.name) - 1] = '\0';
+
+                                        printf("Enter the coefficient: ");
+                                        fflush(stdin);
+                                        scanf("%d", &mat.coeff);
+
+                                        printf("This matter have TP? (1 or 0): ");
+                                        fflush(stdin);
+                                        scanf("%d", &mat.TP);
+                                    }
+                                    break; 
+                            
+                                case 0: 
+                                    printf("Be sure the next time!\n"); // ;)
+                            }
+                        }
+
                         fseek(dep, - (long) sizeof mat, SEEK_CUR);
                         fwrite(&mat, sizeof mat, 1, dep);
                         if(tempChoice)
@@ -219,10 +322,19 @@ int main(void)
       
                 while (1 == fread(&mat, sizeof mat, 1, dep))
                 {
-                    printf("\nMatter #%d\n", mat.ID);
-                    printf("	Name: %s\n", mat.name);
-                    printf("	Coeff: %d\n", mat.coeff);
-                    printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
+                    if (mat.isProject)
+                    {
+                        printf("\nProject #%d:\n", mat.ID);
+                        printf("	Name: %s\n", mat.name);
+                        printf("	Coeff: %d\n", mat.coeff);
+                    }
+                    else
+                    {
+                        printf("\nMatter #%d\n", mat.ID);
+                        printf("	Name: %s\n", mat.name);
+                        printf("	Coeff: %d\n", mat.coeff);
+                        printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
+                    }
                     printf("	Module #%d\n", mat.mod);
                 }
 
