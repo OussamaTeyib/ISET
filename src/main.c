@@ -278,7 +278,7 @@ void printTable(Mod *mods[], int nMods, float moy)
 
     // print the file on the screen
     system("cls");
-    fseek(result, 0, SEEK_SET);
+    rewind(result);
     int c;
     while((c = fgetc(result)) != EOF)
         putchar(c);

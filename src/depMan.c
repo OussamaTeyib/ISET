@@ -226,6 +226,10 @@ int main(void)
                                         printf("Enter the coefficient: ");
                                         fflush(stdin);
                                         scanf("%d", &mat.coeff);
+
+                                        printf("Enter the number of module: ");
+                                        fflush(stdin);
+                                        scanf("%d", &mat.mod);
                                     }
                                     break;
                             
@@ -241,34 +245,42 @@ int main(void)
                             printf("	Module #%d\n", mat.mod);
                         
                             printf("\nWhat do you wanna modifie:\n");
-                            printf("	1. Coeff\n");
-                            printf("	2. Module\n");
-                            printf("	3. Project\n");
+                            printf("	1. Name\n");
+                            printf("	2. Coeff\n");
+                            printf("	3. Module\n");
+                            printf("	4. Project\n");
                             printf("	0. Nothing\n");
                             printf("Enter Your choice: ");
                             do
                             {
                                 fflush(stdin);
                                 scanf("%d", &tempChoice);
-                                if (tempChoice < 0 || tempChoice > 3)
-                                    printf("ERROR!\nEnter a valid choice [0, 3]: ");
-                            } while (tempChoice < 0 || tempChoice > 3);
+                                if (tempChoice < 0 || tempChoice > 4)
+                                    printf("ERROR!\nEnter a valid choice [0, 4]: ");
+                            } while (tempChoice < 0 || tempChoice > 4);
                         
                             switch (tempChoice)
                             {
                                 case 1:
+                                    printf("\nEnter the new name: ");
+                                    fflush(stdin);
+                                    fgets(mat.name, MAX_NAME + 2, stdin);
+                                    mat.name[strlen(mat.name) - 1] = '\0';
+                                    break;
+
+                                case 2:
                                     printf("Enter the new coefficient: ");
                                     fflush(stdin);
                                     scanf("%d", &mat.coeff);
                                     break;
 
-                                case 2:
+                                case 3:
                                     printf("Enter the new number of module: ");
                                     fflush(stdin);
                                     scanf("%d", &mat.mod);
                                     break;
                             
-                                case 3:
+                                case 4:
                                     printf("This is a project? (1/0): ");
                                     fflush(stdin);
                                     scanf("%d", &mat.isProject);
@@ -286,6 +298,10 @@ int main(void)
                                         printf("This matter have TP? (1 or 0): ");
                                         fflush(stdin);
                                         scanf("%d", &mat.TP);
+
+                                        printf("Enter the number of module: ");
+                                        fflush(stdin);
+                                        scanf("%d", &mat.mod);
                                     }
                                     break; 
                             
