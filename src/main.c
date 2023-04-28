@@ -46,6 +46,7 @@ void printTable(Mod **, int, float);
 
 int main(int argc, char *argv[])
 {   
+    system("cls");
     char dName[MAX];  
     if (argc > 2)
     {
