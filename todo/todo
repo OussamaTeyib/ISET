@@ -13,12 +13,10 @@ help option everywhere (at each input)
 
 make a table template file
 
-ask if we should create assist dir and put Departement/ in it
 
 *** after finishing ***
 ** checks***
-- check everything sperate and easy to edit. make the code extensiiiiiive. add a lot of coments.
-- add your info + dou3a2 + link to src on github
+- check everything sperate and easy to edit. make the code extensiiiiiive. add a lot of coments
 - handde the memory correctly (ACF rule, Valgrind) and make the code fast (ask for advices).
 - document every program (add an option in your program to read its user doc and print it)
 - add technical docs for eatch prog (take your time in that. may be a prog's doc in a week)
@@ -30,7 +28,7 @@ ask if we should create assist dir and put Departement/ in it
 ** rsrc version **
 the code have resource bin files
 
-chatgpt says to read the resources, you must use winpi or an alternative for other os (android = linux), so your code must detect the os it is running on
+IT IS SAID THAT to read the resources, you must use winpi or an alternative for other os (android = linux), so your code must detect the os it is running on
 
 use only one main code, but there is something you modify beforer compiling to indicate the targeted departement
 for ex: for 'gab', you modify the main code and set a var to 'gab' and then compile it (you may add this to run program, means it read a value and assign it to the var in main(may be using cmd arguments)), the code now will read the gab.bin file (if you could not write a code for each dep and merge it with its rsrc. but this is similar to our old progs, so no diffrent...)
@@ -40,7 +38,7 @@ ASk chatGPT about run programs, does they exists in real projects how they are c
 
 every thing is in binary format!! ;)
 
-try to sprit it into diffrent files (eg, one for handling bin files other for calculating) and then merge all the src codes into one exe. (after you merge it with the rsc)
+try to spLit it into diffrent files (eg, one for handling bin files other for calculating) and then merge all the src codes into one exe. (after you merge it with the rsc)
 
 rsc file must be one and contains all of the departementes. (to facilitate merging it. search if we could merge 
 lot of files). 
