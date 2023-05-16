@@ -54,7 +54,7 @@ int main(void)
 {   
     FILE *dep = fopen("temp.bin", "wb+");
     if (!dep)
-        die("ERROR: Cannot create the temprary file!");
+        die("ERROR: Cannot create the temoprary file!");
 
     fwrite(DNAME, DSIZE, 1, dep);
     rewind(dep);
@@ -64,7 +64,7 @@ int main(void)
     {
         fclose(dep);
         remove("temp.bin");
-        die("The corresponding file is empty!");
+        die("ERROR: The corresponding file is empty!");
     }
 
     system("cls");
@@ -150,7 +150,7 @@ int main(void)
         totalSum += mods[modCounter]->note * mods[modCounter]->coeff;
         totalCoeff += mods[modCounter]->coeff;
 
-        i += mods[modCounter]->nElm; // skip to the next module
+        i += mods[modCounter]->nElm; // skip to the next modules
         modCounter++;
     } 
     float moy = totalSum / totalCoeff;
