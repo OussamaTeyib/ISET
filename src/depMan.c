@@ -36,7 +36,7 @@ int main(void)
     temp[strlen(temp) - 1] = '\0';
 
     char dName[MAX];
-    snprintf(dName, MAX, "../res/Departements/%s.bin", temp);
+    snprintf(dName, MAX, "../res/bin/%s.bin", temp);
     
     int choice, again, firstTime = 1; // 'add' choice must be provided only one time.
     printf("What do you want:\n");
