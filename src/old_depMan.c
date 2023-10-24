@@ -6,9 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #define MAX 100
 #define MAX_NAME 15 // chars only no '\n' nor '\0'
+
+void die(char *msg)
+{
+    fprintf(stderr, "%s\n", msg);
+    exit(EXIT_FAILURE);
+}
 
 typedef struct
 {
@@ -16,29 +21,11 @@ typedef struct
     // +1: for the initial '\0' that terminates the string
     // +1: for '\0' that terminates the string to remove the '\n' (or a char if the input is &gt; the buffer)
     char name[MAX_NAME + 2];
+    int isProject;
     int coeff;
-    int isUnique; // for 'stage' or 'projet'
-    int isPractical;
-    float dev;
-    float ex;
-    float TP;
-    float elm;
+    int TP;
+    int mod;
 } Matter;
-
-typedef struct {
-    int ID;
-    int nElms;
-    int coeff;
-    float note;
-    int isValidated;
-    Matter *elms;
-} Mod;
-
-void die(char *msg)
-{
-    fprintf(stderr, "%s\n", msg);
-    exit(EXIT_FAILURE);
-}
 
 int main(void)
 {  
@@ -49,9 +36,9 @@ int main(void)
     temp[strlen(temp) - 1] = '\0';
 
     char dName[MAX];
-    snprintf(dName, MAX, "../res/%s.bin", temp);
+    snprintf(dName, MAX, "../res/bin/%s.bin", temp);
     
-    int choice, again, firstTime = 1; // 'add' choice is given only one time.
+    int choice, again, firstTime = 1; // 'add' choice must be provided only one time.
     printf("What do you want:\n");
     printf("	1. Add a departement\n");
     printf("	2. Modify a departement\n");
@@ -83,90 +70,80 @@ int main(void)
                 if (choice < 0 || choice > 2)
                     printf("ERROR!\nEnter a valid choice [0, 2]: ");
             } while (choice < 0 || choice > 2);
-            if (choice) // must be incresed because 'add' option was removed.
+            if (choice) // must be incresed because 'adding' option is removed.
                 choice++;
         }
         firstTime = 0;
 
-        Mod mod;
+        Matter mat;
         FILE *dep;
-        int nModules;
-
+        int nMatters;
         switch (choice)
         {
-            case 1: // add a departement        
+            case 1: // add a departement          
                 dep = fopen(dName, "wb");
                 if(!dep)
                     die("Cannot create the file!");
             
-                printf("Enter the number of modules: ");
+                printf("Enter the number of matters (includes project): ");
                 do
                 {
                     fflush(stdin);
-                    scanf("%d", &nModules);
-                    if (nModules <= 0)
+                    scanf("%d", &nMatters);
+                    if (nMatters < 0)
                     {
-                        printf("Number of modules can't be less than or equal to zero!\n");
+                        printf("Number of matters can't be less than or equal to zero!\n");
                         printf("Again: ");
                     }
-                } while(nModules <= 0);
+                } while(nMatters < 0);
 
-                fwrite(&nModules, sizeof nModules, 1, dep);     
+                fwrite(&nMatters, sizeof nMatters, 1, dep);     
                 int counter = 1;
-                while (counter <= nModules)
+                while (counter <= nMatters)
                 {
-                    mod.ID = counter;
-                    mod.coeff = 0; // just an initialization
- 
-                    printf("Enter the number of elements in the module #%d: ", mod.ID);
-                    do
+                    mat.ID = counter;
+                    printf("\nThis is a project? (1/0): ");
+                    fflush(stdin);
+                    scanf("%d", &mat.isProject);
+                    
+                    if (!mat.isProject)
                     {
+                        printf("Enter the name of the matter #%d: ", mat.ID);
                         fflush(stdin);
-                        scanf("%d", &mod.nElms);
-                        if (mod.nElms <= 0)
-                        {
-                            printf("Number of elements can't be less than or equal to zero!\n");
-                            printf("Again: ");
-                        }
-                    } while (mod.nElms <= 0);
-
-                    mod.elms = malloc(mod.nElms * sizeof (Matter));
-
-                    for (int i = 0; i < mod.nElms; i++)
-                    {
-                        mod.elms[i].ID = i + 1;
-
-                        printf("\nEnter the name of the matter #%d: ", mod.elms[i].ID);
-                        fflush(stdin);
-                        fgets(mod.elms[i].name, MAX_NAME + 2, stdin);
-                        mod.elms[i].name[strlen(mod.elms[i].name) - 1] = '\0';
+                        fgets(mat.name, MAX_NAME + 2, stdin);
+                        mat.name[strlen(mat.name) - 1] = '\0';
                         
                         printf("Enter the coefficient: ");
                         fflush(stdin);
-                        scanf("%d", &mod.elms[i].coeff);
-                        mod.coeff += mod.elms[i].coeff;
-
-                        printf("This matter is a 'projet' or a 'stage'? (1/0): ");
-                        fflush(stdin);
-                        scanf("%d", &mod.elms[i].isUnique);
-                        if (mod.elms[i].isUnique)
-                            continue;
+                        scanf("%d", &mat.coeff);
 
                         printf("This matter have TP? (1 or 0): ");
                         fflush(stdin);
-                        scanf("%d", &mod.elms[i].isPractical);
+                        scanf("%d", &mat.TP);
+                    }
+                    else
+                    {                        
+                        printf("Enter the name of the Project: ");
+                        fflush(stdin);
+                        fgets(mat.name, MAX_NAME + 2, stdin);
+                        mat.name[strlen(mat.name) - 1] = '\0';
+
+                        printf("Enter the coefficient: ");
+                        fflush(stdin);
+                        scanf("%d", &mat.coeff);
                     }
 
-                    if (1 == fwrite(&mod, sizeof mod, 1, dep))
-                        counter++;
+                    printf("Enter the number of module: ");
+                    fflush(stdin);
+                    scanf("%d", &mat.mod);
 
-                    free(mod.elms); 
-                }
-  
-                fclose(dep); // must be closed in order to use it again!           
+                    if (1 == fwrite(&mat, sizeof mat, 1, dep))
+                        counter++;
+                }  
+                fclose(dep);  // must be closed in order to use it again!           
                 break;
 
-            /* case 2: // modify a departement
+            case 2: // modify a departement
                 dep = fopen(dName, "rb+");
                 if (!dep)
                     die("Cannot open the file!");
@@ -345,7 +322,7 @@ int main(void)
                     fprintf(stderr, "The ID is incorrect!\n");
 
                 fclose(dep);        
-                break; */
+                break;
         
             case 3: // print the content of a departement
                 dep = fopen(dName, "rb");
@@ -353,39 +330,39 @@ int main(void)
                     die("Cannot open the file!");
 
                 int empty = 1;
-                if (1 == fread(&nModules, sizeof nModules, 1, dep))
+                if (1 == fread(&nMatters, sizeof nMatters, 1, dep))
                 {
                     empty = 0;
-                    printf("\nNumber of modules in %s is: %d\n\n", temp, nModules); 
+                    printf("\nNumber of matters in %s is: %d\n", temp, nMatters); 
                 }   
       
-                while (1 == fread(&mod, sizeof mod, 1, dep))
+                while (1 == fread(&mat, sizeof mat, 1, dep))
                 {
-                    printf("Module #%d\n", mod.ID);
-                    printf("	Coeff: %d\n", mod.coeff);
-                    printf("	Number of elements: %d\n", mod.nElms);
-                    printf("	Matters:\n\n");
-
-                    for (int i = 0; i < mod.nElms; i++)
+                    if (mat.isProject)
                     {
-                        printf("	Matter #%d\n", mod.elms[i].ID);
-                        printf("	Name: %s\n", mod.elms[i].name);
-                        printf("	Coeff: %d\n", mod.elms[i].coeff);
-                        printf("	Is a 'stage' or 'prjet': %s\n", mod.elms[i].isUnique? "Yes": "No");
-                        printf("	Is practical: %s\n\n", mod.elms[i].isPractical? "Yes": "No");
+                        printf("\nProject #%d:\n", mat.ID);
+                        printf("	Name: %s\n", mat.name);
+                        printf("	Coeff: %d\n", mat.coeff);
                     }
+                    else
+                    {
+                        printf("\nMatter #%d\n", mat.ID);
+                        printf("	Name: %s\n", mat.name);
+                        printf("	Coeff: %d\n", mat.coeff);
+                        printf("	TP: %s\n", (mat.TP? "Yes" : "Non"));
+                    }
+                    printf("	Module #%d\n", mat.mod);
                 }
 
                 if (empty)
-                    printf("\nThis file is EMPTY!\n");
+                    fprintf(stderr, "\nThis file is EMPTY!\n");
 
                 fclose(dep);
                 break;               
 
             case 0:
                 again = 0;                
-        }
-
+        } 
         if (choice)
         {
 	    printf("\nAgain? (1 or 0): ");

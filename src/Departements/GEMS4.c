@@ -52,6 +52,7 @@ void printInfo(void);
 
 int main(void)
 {   
+    // system("chcp 1254");
     FILE *dep = fopen("temp.bin", "wb+");
     if (!dep)
         die("ERROR: Cannot create the temoprary file!");
@@ -208,11 +209,11 @@ char *strlower(char *str)
 
 void printTable(Mod *mods[], int nMods, float moy)
 {
-    printf(" _________________________________________________________________\n");
-    printf("|               |      |      |     |     |     |      |          |\n");
-    printf("|    Élements   |Devoir|Examen| TP  |Note |Coeff|Module|  Mention |\n");
-    printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
-    printf("|               |      |      |     |     |     |      |          |\n");
+    printf(" _______________________________________________\n");
+    printf("|               |      |      |     |     |     |\n");
+    printf("|    Élements   |Devoir|Examen| TP  |Note |Coeff|\n");
+    printf("|_______________|______|______|_____|_____|_____|\n");
+    printf("|               |      |      |     |     |     |\n");
 
     for (int i = 0; i <nMods; i++)
     {
@@ -225,50 +226,46 @@ void printTable(Mod *mods[], int nMods, float moy)
                     printf("%05.2f|", mods[i]->elms[j].TP);
                 else
                     printf("  -  |");
+
                 printf("%05.2f|", mods[i]->elms[j].elm);
-                printf("  %d  |", mods[i]->elms[j].coeff);
-                if ((3 == mods[i]->nElm && j + 1 == 2) || 1 == mods[i]->nElm) 
-                    printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
-                else
-                    printf("      |          |\n");
-
-
-                if (j + 1 < mods[i]->nElm)
-                {
-                    printf("|---------------+------+------+-----+-----+-----|");
-                    if (2 == mods[i]->nElm)
-                        printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
-                    else
-                        printf("      |          |\n");
-                }
-                else if (i + 1 < nMods) 
-                    printf("|---------------+------+------+-----+-----+-----+------+----------| \n");
-                else
-                    printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
+                printf("  %d  |\n", mods[i]->elms[j].coeff);
             }
             else
             {
-                printf("|%-*s|            -            |  %d  | %05.2f|%-*s|\n", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].coeff, mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
-                printf("|_______________|_________________________|_____|______|__________|\n");
+                printf("|%-*s|         -         |%05.2f|  %d  |\n", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].elm, mods[i]->elms[j].coeff); 
             }
+
+            if (j + 1 < mods[i]->nElm)
+                printf("|---------------+------+------+-----+-----+-----|\n");
+            else
+                printf("|---------------+-------------+-----------------|\n");
         }
+
+        printf("|               |     Note    |     Mention     |\n");
+        printf("|    Module %d   |-------------|-----------------|\n", i + 1);
+        printf("|               |    %05.2f    |   %-*s    |\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
+            
+        if (i + 1 < nMods) 
+            printf("|---------------+-------------+-----------------| \n");
+        else
+            printf("|_______________|_____________|_________________|\n");
     }
 
-    printf("|               |                                                 |\n");
-    printf("|    Moyenne    |                    %05.2f                        |\n", moy);
-    printf("|_______________|_________________________________________________|\n");    
+    printf("|               |                               |\n");
+    printf("|    Moyenne    |           %05.2f               |\n", moy);
+    printf("|_______________|_______________________________|\n");    
 }
 
 void printInfo(void)
 {
-    printf(" _________________________________________________________________\n");
-    printf("|                                                                 |\n");
-    printf("|         Ce programme a été écrit par Oussama Med Teyib.         |\n");
-    printf("|_________________________________________________________________|\n");
-    printf("|                                                                 |\n");
-    printf("| Le code source de tous le projet est disponible sur:            |\n");
-    printf("| https://github.com/OussamaTeyib/ISET                            |\n");
-    printf("|_________________________________________________________________|\n");
+    printf(" ______________________________________________\n");
+    printf("|                                               |\n");
+    printf("|Ce programme a été écrit par Oussama Med Teyib |\n");
+    printf("|______________________________________________ |\n");
+    printf("|                                               |\n");
+    printf("| Le code source du projet est disponible sur:  |\n");
+    printf("| https://github.com/OussamaTeyib/ISET          |\n");
+    printf("|_______________________________________________|\n");
 }
 
 unsigned char GEMS4[] = {0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x56, 0x75, 0x6C, 0x67, 0x61, 0x72, 0x69, 0x73, 0x61, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x56, 0x65, 0x6E, 0x74, 0x69, 0x6C, 0x61, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x4D, 0x6F, 0x74, 0x65, 0x75, 0x72, 0x73, 0x00, 0x00, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x45, 0x6C, 0x65, 0x63, 0x74, 0x72, 0x6F, 0x74, 0x65, 0x63, 0x68, 0x2E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x49, 0x6E, 0x73, 0x74, 0x72, 0x75, 0x6D, 0x65, 0x6E, 0x74, 0x61, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x4D, 0x61, 0x74, 0x65, 0x72, 0x69, 0x61, 0x75, 0x78, 0x00, 0x00, 0x74, 0x69, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x43, 0x6F, 0x6E, 0x73, 0x74, 0x2E, 0x20, 0x4D, 0x65, 0x63, 0x2E, 0x00, 0x00, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x53, 0x74, 0x61, 0x67, 0x65, 0x00, 0x00, 0x4D, 0x65, 0x71, 0x2E, 0x00, 0x00, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00};
