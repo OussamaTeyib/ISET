@@ -23,7 +23,7 @@ typedef struct
     float dev;
     float ex;
     float TP;
-    float elm;
+    float note;
 } Element;
 
 typedef struct {
@@ -159,7 +159,7 @@ int main(void)
                         if (mod->elms[i].isSpecial)
                             continue;
 
-                        printf("Does this element have TP? (1 or 0): ");
+                        printf("Does this element have a TP? (1/0): ");
                         fflush(stdin);
                         scanf("%d", &mod->elms[i].isPractical);
                     }
