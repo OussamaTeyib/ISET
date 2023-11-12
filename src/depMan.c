@@ -1,6 +1,6 @@
 /* Departements' Files Manager
-   Written by Oussama Teyib
-   April 2023
+ * Written by Oussama Teyib
+ * April 2023                  
 */
 
 #include <stdio.h>
@@ -8,7 +8,7 @@
 #include <string.h>
 #include <wchar.h>
 
-#define MAX 100
+#define MAX 128
 #define MAX_NAME 15 // chars only no '\n' nor '\0'
 
 typedef struct
@@ -45,6 +45,7 @@ int main(void)
 {  
     system("chcp 1254");
     system("cls");
+
     char temp[MAX];
     printf("Enter the name of the departement: ");
     fgets(temp, MAX, stdin);
