@@ -2,9 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#define MAX 50
+#define MAX 64
 
 void die(char *msg)
 {
@@ -14,67 +13,41 @@ void die(char *msg)
 
 int main(int argc, char* argv[])
 {
-    char input[MAX], output[MAX], arrName[MAX];
-    if (argc == 3)
-    {
-        char tempInput[MAX], tempOutput[MAX];
-        strncpy(tempInput, argv[1], MAX);
-        snprintf(input, MAX, "../res/bin/%s", tempInput);
- 
-        strncpy(tempOutput, argv[2], MAX);
-        snprintf(output, MAX, "../res/hex/%s", tempOutput); 
+    system("chcp 1254");
+    system("cls");
 
-        strncpy(arrName, tempOutput, MAX);
-        arrName[strcspn(arrName, ".")] = '\0';
+    char depName[MAX];
+    if (2 == argc)
+    {
+        snprintf(depName, MAX, "../res/%s.bin", argv[1]);
     }
     else
     {
-        char tempInput[MAX], tempOutput[MAX];
-        printf("Enter the name of the input file: ");
-        fgets(tempInput, MAX, stdin);
-        tempInput[strcspn(tempInput, "\n")] = '\0';
-        snprintf(input, MAX, "../res/bin/%s", tempInput);
-
-        printf("Enter the name of the output file: ");
-        fgets(tempOutput, MAX, stdin);
-        tempOutput[strcspn(tempOutput, "\n")] = '\0';
-        snprintf(output, MAX, "../res/hex/%s", tempOutput);
-
-        strncpy(arrName, tempOutput, MAX);
-        arrName[strcspn(arrName, ".")] = '\0';
+        die("Usage: dep2hex <dep-name>");
     }
 
-    FILE* fin = fopen(input, "rb");
-    if (!fin)
+    FILE* dep = fopen(depName, "rb");
+    if (!dep)
         die("ERROR: cannot open the input file!");
        
     // get the size of the input file
-    fseek(fin, 0, SEEK_END);
-    int size = ftell(fin);
-    rewind(fin);
-    
-    FILE* fout = fopen(output, "w");
-    if(!fout)
-    {
-        fclose(fin);
-        die("ERROR: cannot create the output file!");
-    }   
+    fseek(dep, 0, SEEK_END);
+    size_t size = ftell(dep);
+    rewind(dep);
 
     unsigned char byte;
     size_t count = 0;
-    fprintf(fout, "unsigned char %s[] = {", arrName); 
-    while (1 == fread(&byte, 1, 1, fin))
+    printf("unsigned char %s[] = {", argv[1]); 
+    while (1 == fread(&byte, 1, 1, dep))
     {
-        fprintf(fout, "0x%02X", byte);
+        printf("0x%02X", byte);
         if (count < size - 1) // '-1' to avoid the last byte
-            fprintf(fout, ", ");
+            printf(", ");
         count++;
     }
-    fprintf(fout, "};\n");
-    fprintf(fout, "size_t %s_SIZE = %zu;\n", arrName, count);
+    printf("};\n");
+    printf("size_t %s_SIZE = %zu;\n", argv[1], count);
 
-    printf("%zu bytes successfully printed!\n", count);
-    fclose(fin);
-    fclose(fout);
+    fclose(dep);
     return EXIT_SUCCESS;
 }
