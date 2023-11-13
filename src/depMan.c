@@ -42,7 +42,9 @@ void die(char *msg)
 
 int main(void)
 {
+    system("chcp 65001");
     system("cls");
+
     char temp[MAX];
     printf("Enter the name of the departement: ");
     fgets(temp, MAX, stdin);

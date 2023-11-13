@@ -167,39 +167,53 @@ void printTable(Mod *mods[], int nMods, float grade)
     {
         for (int j = 0; j < mods[i]->nElms; j++)
         {
+            printf("|%-*s|", MAX_NAME, mods[i]->elms[j].name);
+            // if this is not a 'stage' or a 'projet'
             if (!mods[i]->elms[j].isSpecial)
             {
-                printf("|%-*s| %05.2f| %05.2f|", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].dev, mods[i]->elms[j].ex);
+                printf(" %05.2f| %05.2f|", mods[i]->elms[j].dev, mods[i]->elms[j].ex);
+                // Does this element have a 'TP'
                 if (mods[i]->elms[j].isPractical)
                     printf("%05.2f|", mods[i]->elms[j].TP);
                 else
                     printf("  -  |");
-
-                printf("%05.2f|", mods[i]->elms[j].note);
-                printf("  %d  |", mods[i]->elms[j].coeff);
-                if ((3 == mods[i]->nElms && j + 1 == 2) || 1 == mods[i]->nElms) 
-                    printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
-                else
-                    printf("      |          |\n");
-
-
-                if (j + 1 < mods[i]->nElms)
-                {
-                    printf("|---------------+------+------+-----+-----+-----|");
-                    if (2 == mods[i]->nElms)
-                        printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
-                    else
-                        printf("      |          |\n");
-                }
-                else if (i + 1 < nMods) 
-                    printf("|---------------+------+------+-----+-----+-----+------+----------| \n");
-                else
-                    printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
             }
             else
             {
-                printf("|%-*s|            -            |  %d  | %05.2f|%-*s|\n", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].coeff, mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
-                printf("|_______________|_________________________|_____|______|__________|\n");
+                printf("         -         |");
+            }
+
+            printf("%05.2f|", mods[i]->elms[j].note);
+            printf("  %d  |", mods[i]->elms[j].coeff);
+
+            // if there is one or three element(s) in the module
+            if (1 == mods[i]->nElms || (3 == mods[i]->nElms && j + 1 == 2))
+            {
+                printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
+            }
+            else
+            {
+                printf("      |          |\n");
+            }
+
+            // if this is not the last element in the module
+            if (j + 1 < mods[i]->nElms)
+            {
+                printf("|---------------+------+------+-----+-----+-----|");
+                // if there is only two elements in the module
+                if (2 == mods[i]->nElms)
+                    printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
+                else
+                    printf("      |          |\n");
+            }
+            // if this is not the last element in the whole departement
+            else if (i + 1 < nMods)
+            { 
+                printf("|---------------+------+------+-----+-----+-----+------+----------| \n");
+            }
+            else
+            {
+                printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
             }
         }
     }

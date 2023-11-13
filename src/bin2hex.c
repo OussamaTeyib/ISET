@@ -28,7 +28,12 @@ int main(int argc, char* argv[])
     FILE* dep = fopen(depName, "rb");
     if (!dep)
         die("ERROR: cannot open the input file!");
-       
+
+    printf("#define DNAME %s\n", argv[1]);
+    printf("#define DSIZE %s_SIZE\n", argv[1]);
+    printf("extern unsigned char %s[];\n", argv[1]);
+    printf("extern size_t %s_SIZE;\n\n", argv[1]);
+  
     // get the size of the input file
     fseek(dep, 0, SEEK_END);
     size_t size = ftell(dep);
