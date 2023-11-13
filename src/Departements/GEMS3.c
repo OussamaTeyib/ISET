@@ -38,7 +38,7 @@ void die(char *msg)
     exit(EXIT_FAILURE);
 }
 
-void printTable(Mod *mods[], int nMods, float ave);
+void printTable(Mod *mods[], int nMods, float grade);
 void printInfo(void);
 
 int main(void)
@@ -72,10 +72,6 @@ int main(void)
 
         fread(mods[i], sizeof (Mod) + sizeof (Element[nElms]), 1, dep);
     }
-
-    // Clean-up
-    fclose(dep); 
-    remove("temp.bin"); // we're done with it!
 
     // Get the notes from the user
     for (int i = 0; i < nMods; i++)
@@ -135,29 +131,31 @@ int main(void)
         mods[i]->isValidated = isValidated;
     }
 
-    // Calculate the average
-    float ave, totalSum = 0.0f;
+    // Calculate the grade
+    float grade, totalSum = 0.0f;
     int totalCoeff = 0;
     for (int i = 0; i < nMods; i++)
     {
         totalSum += mods[i]->note * mods[i]->coeff;
         totalCoeff += mods[i]->coeff;
     }
-    ave = totalSum / totalCoeff;
+    grade = totalSum / totalCoeff;
 
 
     // Output the results
-    printTable(mods, nMods, ave);
+    printTable(mods, nMods, grade);
     printInfo();
 
     // Clean-up
     for (int i = 0; i < nMods; i++)
         free(mods[i]);
 
+    fclose(dep); 
+    remove("temp.bin");
     return EXIT_SUCCESS;    
 }
 
-void printTable(Mod *mods[], int nMods, float ave)
+void printTable(Mod *mods[], int nMods, float grade)
 {
     printf(" _________________________________________________________________\n");
     printf("|               |      |      |     |     |     |      |          |\n");
@@ -169,45 +167,59 @@ void printTable(Mod *mods[], int nMods, float ave)
     {
         for (int j = 0; j < mods[i]->nElms; j++)
         {
+            printf("|%-*s|", MAX_NAME, mods[i]->elms[j].name);
+            // if this is not a 'stage' or a 'projet'
             if (!mods[i]->elms[j].isSpecial)
             {
-                printf("|%-*s| %05.2f| %05.2f|", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].dev, mods[i]->elms[j].ex);
+                printf(" %05.2f| %05.2f|", mods[i]->elms[j].dev, mods[i]->elms[j].ex);
+                // Does this element have a 'TP'
                 if (mods[i]->elms[j].isPractical)
                     printf("%05.2f|", mods[i]->elms[j].TP);
                 else
                     printf("  -  |");
-
-                printf("%05.2f|", mods[i]->elms[j].note);
-                printf("  %d  |", mods[i]->elms[j].coeff);
-                if ((3 == mods[i]->nElms && j + 1 == 2) || 1 == mods[i]->nElms) 
-                    printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
-                else
-                    printf("      |          |\n");
-
-
-                if (j + 1 < mods[i]->nElms)
-                {
-                    printf("|---------------+------+------+-----+-----+-----|");
-                    if (2 == mods[i]->nElms)
-                        printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
-                    else
-                        printf("      |          |\n");
-                }
-                else if (i + 1 < nMods) 
-                    printf("|---------------+------+------+-----+-----+-----+------+----------| \n");
-                else
-                    printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
             }
             else
             {
-                printf("|%-*s|            -            |  %d  | %05.2f|%-*s|\n", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].coeff, mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
-                printf("|_______________|_________________________|_____|______|__________|\n");
+                printf("         -         |");
+            }
+
+            printf("%05.2f|", mods[i]->elms[j].note);
+            printf("  %d  |", mods[i]->elms[j].coeff);
+
+            // if there is one or three element(s) in the module
+            if (1 == mods[i]->nElms || (3 == mods[i]->nElms && j + 1 == 2))
+            {
+                printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
+            }
+            else
+            {
+                printf("      |          |\n");
+            }
+
+            // if this is not the last element in the module
+            if (j + 1 < mods[i]->nElms)
+            {
+                printf("|---------------+------+------+-----+-----+-----|");
+                // if there is only two elements in the module
+                if (2 == mods[i]->nElms)
+                    printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
+                else
+                    printf("      |          |\n");
+            }
+            // if this is not the last element in the whole departement
+            else if (i + 1 < nMods)
+            { 
+                printf("|---------------+------+------+-----+-----+-----+------+----------| \n");
+            }
+            else
+            {
+                printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
             }
         }
     }
 
     printf("|               |                                                 |\n");
-    printf("|    Moyenne    |                    %05.2f                        |\n", ave);
+    printf("|    Moyenne    |                    %05.2f                        |\n", grade);
     printf("|_______________|_________________________________________________|\n");    
 }
 
