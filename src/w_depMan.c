@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 #define MAX 128
 #define MAX_NAME 15 // chars only no '\n' nor '\0'
@@ -15,7 +16,7 @@ typedef struct
     int ID;
     // +1: for the initial '\0' that terminates the string
     // +1: for '\0' that terminates the string to remove the '\n' (or a char if the input is &gt; the buffer)
-    char name[MAX_NAME + 2];
+    wchar_t name[MAX_NAME + 2];
     int coeff;
     int isSpecial; // for 'stage' or 'projet'
     int isPractical;
@@ -41,8 +42,10 @@ void die(char *msg)
 }
 
 int main(void)
-{
+{  
+    system("chcp 1254");
     system("cls");
+
     char temp[MAX];
     printf("Enter the name of the departement: ");
     fgets(temp, MAX, stdin);
@@ -143,8 +146,8 @@ int main(void)
 
                         printf("\nEnter the name of element #%d: ", mod->elms[i].ID);
                         fflush(stdin);
-                        fgets(mod->elms[i].name, MAX_NAME + 2, stdin);
-                        mod->elms[i].name[strlen(mod->elms[i].name) - 1] = '\0';
+                        fgetws(mod->elms[i].name, MAX_NAME + 2, stdin);
+                        mod->elms[i].name[wcslen(mod->elms[i].name) - 1] = L'\0';
                         
                         printf("Enter the coefficient: ");
                         fflush(stdin);
@@ -210,7 +213,7 @@ int main(void)
                     for (int i = 0; i < mod->nElms; i++)
                     {
                         printf("	Element #%d:\n", mod->elms[i].ID);
-                        printf("		Name: %s\n", mod->elms[i].name);
+                        wprintf(L"		Name: %ls\n", mod->elms[i].name);
                         printf("		Coeff: %d\n", mod->elms[i].coeff);
                         printf("		Is a 'stage' or a 'projet': %s\n", mod->elms[i].isSpecial? "Yes": "No");
 
