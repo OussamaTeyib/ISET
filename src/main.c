@@ -38,7 +38,7 @@ void die(char *msg)
     exit(EXIT_FAILURE);
 }
 
-void printTable(Mod *mods[], int nMods, float ave);
+void printTable(Mod *mods[], int nMods, float grade);
 void printInfo(void);
 
 int main(void)
@@ -72,10 +72,6 @@ int main(void)
 
         fread(mods[i], sizeof (Mod) + sizeof (Element[nElms]), 1, dep);
     }
-
-    // Clean-up
-    fclose(dep); 
-    remove("temp.bin"); // we're done with it!
 
     // Get the notes from the user
     for (int i = 0; i < nMods; i++)
@@ -135,29 +131,31 @@ int main(void)
         mods[i]->isValidated = isValidated;
     }
 
-    // Calculate the average
-    float ave, totalSum = 0.0f;
+    // Calculate the grade
+    float grade, totalSum = 0.0f;
     int totalCoeff = 0;
     for (int i = 0; i < nMods; i++)
     {
         totalSum += mods[i]->note * mods[i]->coeff;
         totalCoeff += mods[i]->coeff;
     }
-    ave = totalSum / totalCoeff;
+    grade = totalSum / totalCoeff;
 
 
     // Output the results
-    printTable(mods, nMods, ave);
+    printTable(mods, nMods, grade);
     printInfo();
 
     // Clean-up
     for (int i = 0; i < nMods; i++)
         free(mods[i]);
 
+    fclose(dep); 
+    remove("temp.bin");
     return EXIT_SUCCESS;    
 }
 
-void printTable(Mod *mods[], int nMods, float ave)
+void printTable(Mod *mods[], int nMods, float grade)
 {
     printf(" _________________________________________________________________\n");
     printf("|               |      |      |     |     |     |      |          |\n");
@@ -207,7 +205,7 @@ void printTable(Mod *mods[], int nMods, float ave)
     }
 
     printf("|               |                                                 |\n");
-    printf("|    Moyenne    |                    %05.2f                        |\n", ave);
+    printf("|    Moyenne    |                    %05.2f                        |\n", grade);
     printf("|_______________|_________________________________________________|\n");    
 }
 
