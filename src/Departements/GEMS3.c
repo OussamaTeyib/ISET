@@ -1,169 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
-#define MAX 100
-#define MAX_NAME 15
-#define MAX_CAPTION 10
 
 #define DNAME GEMS3
 #define DSIZE GEMS3_SIZE
 extern unsigned char GEMS3[];
 extern size_t GEMS3_SIZE;
 
-// the struct to be read from the department's file
-typedef struct { 
-    int ID;
-    char name[MAX_NAME + 2];
-    int isProject;
-    int coeff;
-    int isTP;
-    int mod;
-} Matter;
+#define MAX 128
+#define MAX_NAME 15
+#define MAX_CAPTION 10
 
-typedef struct {
+typedef struct
+{
     int ID;
     char name[MAX_NAME + 2];
-    int isProject;
     int coeff;
-    int isTP;
-    int mod;
+    int isSpecial; // for 'stage' or 'projet'
+    int isPractical;
     float dev;
     float ex;
     float TP;
-    float elm;
-} FullMatter; 
+    float note;
+} Element;
 
 typedef struct {
     int ID;
-    int nElm;
+    int nElms;
     int coeff;
     float note;
-    int caption;
-    FullMatter elms[];
+    int isValidated;
+    Element elms[];
 } Mod;
-
-void die(char *);
-int isVowel(char);
-char *strlower(char *);
-void printTable(Mod **, int, float);
-void printInfo(void);
-
-int main(void)
-{   
-    FILE *dep = fopen("temp.bin", "wb+");
-    if (!dep)
-        die("ERROR: Cannot create the temprary file!");
-
-    fwrite(DNAME, DSIZE, 1, dep);
-    rewind(dep);
-
-    int nMatters;
-    if (1 != fread(&nMatters, sizeof nMatters, 1, dep))
-    {
-        fclose(dep);
-        remove("temp.bin");
-        die("ERROR: The corresponding file is empty!");
-    }
-
-    system("cls");
-    Matter mat;
-    FullMatter fmat[nMatters];
-    for (int i = 0; i < nMatters; i++)
-    {
-        // cpy mat to fmat[i]
-        fread(&mat, sizeof mat, 1, dep);
-        fmat[i].ID = mat.ID;
-        strncpy(fmat[i].name, mat.name, MAX_NAME + 2);
-        fmat[i].coeff = mat.coeff;
-        fmat[i].mod = mat.mod;
-        fmat[i].isProject = mat.isProject; 
-        if (fmat[i].isProject)
-        {
-            printf("Saisir la note du %s: ", strlower(fmat[i].name));
-            fflush(stdin);
-            scanf("%f", &fmat[i].elm);
-            continue;
-        }
-
-        fmat[i].isTP = mat.isTP;
-        printf("Saisir la note d%s%s\n", (isVowel(fmat[i].name[0])? "'" : "e "), strlower(fmat[i].name));
-        printf("Devoir: ");
-        scanf("%f", &fmat[i].dev);
-        printf("Examen: ");
-        scanf("%f", &fmat[i].ex);
-        if (fmat[i].isTP)
-        {
-            printf("TP: ");
-            scanf("%f", &fmat[i].TP);
-            fmat[i].elm = (fmat[i].ex * 3 + fmat[i].dev * 2 + fmat[i].TP) / 6;
-        }
-        else
-            fmat[i].elm = (fmat[i].ex * 3 + fmat[i].dev * 2) / 5;
-    }
-
-    fclose(dep); 
-    remove("temp.bin"); // we're done with it!
-
-    int nMods = fmat[nMatters - 1].mod; // the module of last matter is the number of modules in the departement
-
-    Mod *mods[nMods];
-    float totalSum = 0.0f;
-    int totalCoeff = 0, modCounter = 0;
-    for (int i = 0; i < nMatters;)
-    {
-        int nElm = 0; // count number of elements in this module
-        for (int j = i; fmat[j].mod == fmat[i].mod; j++, nElm++);
-        // Allocate memory for nElm of elements
-        mods[modCounter] = malloc(sizeof(Mod) + sizeof(FullMatter[nElm]));
-
-        mods[modCounter]->nElm = nElm;
-        mods[modCounter]->ID = modCounter + 1; // '+1' because that modCounter is an index statrs with 0
-        mods[modCounter]->coeff = 0; // just an initialisation
-        float tempSum = 0.0f;
-        for (int j = i; j < i + mods[modCounter]->nElm; j++)
-        {                    
-            mods[modCounter]->coeff += fmat[j].coeff;
-            tempSum += fmat[j].elm * fmat[j].coeff;
-            mods[modCounter]->elms[j - i] = fmat[j]; // 'j - i' for indexing   
-        }
-        // note of the module
-        mods[modCounter]->note = tempSum / mods[modCounter]->coeff;
-
-        // is this module validated?
-        int isValidated = 0;
-        if (mods[modCounter]->note >= 10)
-        {
-            isValidated = 1;
-            for (int j = i; j < i + mods[modCounter]->nElm; j++)
-            {
-                if (mods[modCounter]->elms[j - i].elm < 7)
-                {
-                    isValidated = 0;
-                    break;
-                }
-            }
-        }
-        mods[modCounter]->caption = isValidated;
-
-        totalSum += mods[modCounter]->note * mods[modCounter]->coeff;
-        totalCoeff += mods[modCounter]->coeff;
-
-        i += mods[modCounter]->nElm; // skip to the next modules
-        modCounter++;
-    } 
-    float moy = totalSum / totalCoeff;
-
-    printTable(mods, nMods, moy);
-    printInfo();
-
-    // free the memory allocated for the modules
-    for (int i = 0; i < nMods; i++)
-        free(mods[i]);
-
-    return EXIT_SUCCESS;    
-}
 
 void die(char *msg)
 {
@@ -171,42 +38,126 @@ void die(char *msg)
     exit(EXIT_FAILURE);
 }
 
-int isVowel(char c)
+void printTable(Mod *mods[], int nMods, float ave);
+void printInfo(void);
+
+int main(void)
 {
-    switch(c)
+    system("chcp 65001");
+    system("cls");
+
+    // Turn the array into a file  
+    FILE *dep = fopen("temp.bin", "wb+");
+    if (!dep)
+        die("Cannot Create a temprary file!");
+
+    fwrite(DNAME, DSIZE, 1, dep);
+    rewind(dep);
+
+    // Get the number of modules
+    int nMods;
+    fread(&nMods, sizeof nMods, 1, dep);
+
+    // Get modules from the file
+    Mod *mods[nMods];
+    for (int i = 0; i < nMods; i++)
     {
-        case 'a':
-        case 'e':
-        case 'i':
-        case 'o':
-        case 'u':
-        case 'h':
-        case 'A':
-        case 'E':
-        case 'I':
-        case 'O':
-        case 'U':
-        case 'H':
-            return 1;
-        default:
-            return 0;
+        int nElms;
+        if (1 != fread(&nElms, sizeof nElms, 1, dep))
+            break;
+
+        mods[i] = malloc(sizeof (Mod) + sizeof (Element[nElms]));
+        if (!mods[i])
+            die("Cannot allocate memory!");
+
+        fread(mods[i], sizeof (Mod) + sizeof (Element[nElms]), 1, dep);
     }
+
+    // Clean-up
+    fclose(dep); 
+    remove("temp.bin"); // we're done with it!
+
+    // Get the notes from the user
+    for (int i = 0; i < nMods; i++)
+    {
+        printf("Module #%d:\n", mods[i]->ID);
+
+        for (int j = 0; j < mods[i]->nElms; j++)
+        {
+            if (mods[i]->elms[j].isSpecial)
+            {
+                printf("Saisir la note de '%s': ", mods[i]->elms[j].name);
+                scanf("%f", &mods[i]->elms[j].note);
+                continue;
+            }
+
+            printf("Saisir la note de '%s':\n", mods[i]->elms[j].name);
+            printf("Devoir: ");
+            scanf("%f", &mods[i]->elms[j].dev);
+            printf("Examen: ");
+            scanf("%f", &mods[i]->elms[j].ex);
+            if (mods[i]->elms[j].isPractical)
+            {
+                printf("TP: ");
+                scanf("%f", &mods[i]->elms[j].TP);
+                mods[i]->elms[j].note = (mods[i]->elms[j].ex * 3 + mods[i]->elms[j].dev * 2 + mods[i]->elms[j].TP) / 6;
+            }
+            else
+                mods[i]->elms[j].note = (mods[i]->elms[j].ex * 3 + mods[i]->elms[j].dev * 2) / 5;
+        }
+
+        printf("\n");
+    }
+
+    // Calculate notes of modules
+    for (int i = 0; i < nMods; i++)
+    {
+        float tempSum = 0.0f;
+        for (int j = 0; j < mods[i]->nElms; j++)       
+            tempSum += mods[i]->elms[j].note * mods[i]->elms[j].coeff;
+
+        mods[i]->note = tempSum / mods[i]->coeff;
+
+        // is this module validated?
+        int isValidated = 0;
+        if (mods[i]->note >= 10)
+        {
+            isValidated = 1;
+            for (int j = 0; j < mods[i]->nElms; j++)
+            {
+                if (mods[i]->elms[j].note < 7)
+                {
+                    isValidated = 0;
+                    break;
+                }
+            }
+        }
+        mods[i]->isValidated = isValidated;
+    }
+
+    // Calculate the average
+    float ave, totalSum = 0.0f;
+    int totalCoeff = 0;
+    for (int i = 0; i < nMods; i++)
+    {
+        totalSum += mods[i]->note * mods[i]->coeff;
+        totalCoeff += mods[i]->coeff;
+    }
+    ave = totalSum / totalCoeff;
+
+
+    // Output the results
+    printTable(mods, nMods, ave);
+    printInfo();
+
+    // Clean-up
+    for (int i = 0; i < nMods; i++)
+        free(mods[i]);
+
+    return EXIT_SUCCESS;    
 }
 
-char *strlower(char *str)
-{
-    if (!strlen(str))
-        return NULL;
-
-    char *lowstr = malloc(MAX_NAME + 1);
-    for (int i = 0; i < MAX_NAME; i++)
-        lowstr[i] = tolower(str[i]);
-
-    lowstr[MAX_NAME + 1] = '\0';
-    return lowstr;
-}
-
-void printTable(Mod *mods[], int nMods, float moy)
+void printTable(Mod *mods[], int nMods, float ave)
 {
     printf(" _________________________________________________________________\n");
     printf("|               |      |      |     |     |     |      |          |\n");
@@ -214,30 +165,31 @@ void printTable(Mod *mods[], int nMods, float moy)
     printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
     printf("|               |      |      |     |     |     |      |          |\n");
 
-    for (int i = 0; i <nMods; i++)
+    for (int i = 0; i < nMods; i++)
     {
-        for (int j = 0; j < mods[i]->nElm; j++)
+        for (int j = 0; j < mods[i]->nElms; j++)
         {
-            if (!mods[i]->elms[j].isProject)
+            if (!mods[i]->elms[j].isSpecial)
             {
                 printf("|%-*s| %05.2f| %05.2f|", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].dev, mods[i]->elms[j].ex);
-                if (mods[i]->elms[j].isTP)
+                if (mods[i]->elms[j].isPractical)
                     printf("%05.2f|", mods[i]->elms[j].TP);
                 else
                     printf("  -  |");
-                printf("%05.2f|", mods[i]->elms[j].elm);
+
+                printf("%05.2f|", mods[i]->elms[j].note);
                 printf("  %d  |", mods[i]->elms[j].coeff);
-                if ((3 == mods[i]->nElm && j + 1 == 2) || 1 == mods[i]->nElm) 
-                    printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
+                if ((3 == mods[i]->nElms && j + 1 == 2) || 1 == mods[i]->nElms) 
+                    printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
                 else
                     printf("      |          |\n");
 
 
-                if (j + 1 < mods[i]->nElm)
+                if (j + 1 < mods[i]->nElms)
                 {
                     printf("|---------------+------+------+-----+-----+-----|");
-                    if (2 == mods[i]->nElm)
-                        printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
+                    if (2 == mods[i]->nElms)
+                        printf(" %05.2f|%-*s|\n", mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
                     else
                         printf("      |          |\n");
                 }
@@ -248,14 +200,14 @@ void printTable(Mod *mods[], int nMods, float moy)
             }
             else
             {
-                printf("|%-*s|            -            |  %d  | %05.2f|%-*s|\n", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].coeff, mods[i]->note, MAX_CAPTION, mods[i]->caption? "  Validé  " : "Non Validé");
+                printf("|%-*s|            -            |  %d  | %05.2f|%-*s|\n", MAX_NAME, mods[i]->elms[j].name, mods[i]->elms[j].coeff, mods[i]->note, MAX_CAPTION, mods[i]->isValidated? "  Validé  " : "Non Validé");
                 printf("|_______________|_________________________|_____|______|__________|\n");
             }
         }
     }
 
     printf("|               |                                                 |\n");
-    printf("|    Moyenne    |                    %05.2f                        |\n", moy);
+    printf("|    Moyenne    |                    %05.2f                        |\n", ave);
     printf("|_______________|_________________________________________________|\n");    
 }
 
@@ -266,33 +218,10 @@ void printInfo(void)
     printf("|         Ce programme a été écrit par Oussama Med Teyib.         |\n");
     printf("|_________________________________________________________________|\n");
     printf("|                                                                 |\n");
-    printf("| Le code source de tous le projet est disponible sur:            |\n");
+    printf("| Le code source du projet est disponible sur:                    |\n");
     printf("| https://github.com/OussamaTeyib/ISET                            |\n");
     printf("|_________________________________________________________________|\n");
 }
 
-unsigned char GEMS3[] = {
-        0x09, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x46, 0x72, 0x61, 0x6E, 0x63, 0x61, 0x69, 0x73, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 
-        0x45, 0x63, 0x6F, 0x6E, 0x6F, 0x6D, 0x69, 0x65, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x44, 0x65, 0x73, 0x73, 0x69, 0x6E, 0x00, 0x00, 
-        0x6E, 0x64, 0x75, 0x73, 0x74, 0x2E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 
-        0x4D, 0x65, 0x63, 0x2E, 0x20, 0x65, 0x74, 0x20, 0x52, 0x44, 0x4D, 0x00, 0x00, 0x52, 0x44, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 
-        0x02, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x50, 0x72, 0x6F, 0x63, 0x65, 0x64, 0x65, 0x73, 
-        0x20, 0x64, 0x65, 0x20, 0x46, 0x61, 0x62, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 
-        0x41, 0x75, 0x74, 0x6F, 0x6D, 0x61, 0x74, 0x69, 0x73, 0x6D, 0x65, 0x73, 0x00, 0x00, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 
-        0x03, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x43, 0x6F, 0x6D, 0x70, 0x6F, 0x73, 0x61, 0x6E, 
-        0x74, 0x73, 0x00, 0x00, 0x6C, 0x65, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 
-        0x53, 0x68, 0x65, 0x6D, 0x61, 0x73, 0x20, 0x65, 0x74, 0x20, 0x43, 0x61, 0x62, 0x2E, 0x00, 0x00, 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 
-        0x04, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x41, 0x75, 0x74, 0x6F, 0x6D, 0x61, 0x74, 0x69, 
-        0x71, 0x75, 0x65, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-        0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00};
-size_t GEMS3_SIZE = 364;
+unsigned char GEMS3[] = {0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0xB0, 0x01, 0x00, 0x00, 0x49, 0x4E, 0x5F, 0x52, 0x01, 0x00, 0x00, 0x00, 0x46, 0x72, 0x61, 0x6E, 0x63, 0x61, 0x69, 0x73, 0x00, 0x00, 0x4F, 0x55, 0x53, 0x53, 0x00, 0x55, 0x53, 0x45, 0x52, 0x4E, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x53, 0x45, 0x52, 0x50, 0x52, 0x4F, 0x46, 0x49, 0x4C, 0x45, 0x3D, 0x43, 0x3A, 0x5C, 0x55, 0x02, 0x00, 0x00, 0x00, 0x45, 0x63, 0x6F, 0x6E, 0x6F, 0x6D, 0x69, 0x65, 0x00, 0x00, 0x69, 0x61, 0x73, 0x65, 0x73, 0x3D, 0x43, 0x3A, 0x5C, 0x50, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0x5C, 0x63, 0x6F, 0x6E, 0x66, 0x69, 0x67, 0x5C, 0x75, 0x73, 0x65, 0x72, 0x5F, 0x61, 0x6C, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0xB0, 0x01, 0x00, 0x00, 0x49, 0x4E, 0x5F, 0x52, 0x01, 0x00, 0x00, 0x00, 0x44, 0x65, 0x73, 0x73, 0x69, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x4F, 0x55, 0x53, 0x53, 0x00, 0x55, 0x53, 0x45, 0x52, 0x4E, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x55, 0x53, 0x45, 0x52, 0x50, 0x52, 0x4F, 0x46, 0x49, 0x4C, 0x45, 0x3D, 0x43, 0x3A, 0x5C, 0x55, 0x02, 0x00, 0x00, 0x00, 0x52, 0x44, 0x4D, 0x00, 0x00, 0x6D, 0x69, 0x65, 0x00, 0x00, 0x69, 0x61, 0x73, 0x65, 0x73, 0x3D, 0x43, 0x3A, 0x5C, 0x50, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x72, 0x5C, 0x63, 0x6F, 0x6E, 0x66, 0x69, 0x67, 0x5C, 0x75, 0x73, 0x65, 0x72, 0x5F, 0x61, 0x6C, 0x03, 0x00, 0x00, 0x00, 0x50, 0x72, 0x6F, 0x63, 0x65, 0x64, 0x65, 0x73, 0x00, 0x00, 0x00, 0x07, 0xC0, 0x2B, 0x00, 0x00, 0x30, 0x78, 0xAC, 0xE1, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x45, 0x4E, 0x44, 0x4F, 0x52, 0x45, 0x44, 0x5F, 0x05, 0x00, 0x00, 0x05, 0xD8, 0x2B, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0xB0, 0x01, 0x00, 0x00, 0x49, 0x4E, 0x5F, 0x52, 0x01, 0x00, 0x00, 0x00, 0x41, 0x75, 0x74, 0x6F, 0x6D, 0x61, 0x74, 0x69, 0x73, 0x6D, 0x65, 0x73, 0x00, 0x00, 0x00, 0x55, 0x53, 0x45, 0x52, 0x4E, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x55, 0x53, 0x45, 0x52, 0x50, 0x52, 0x4F, 0x46, 0x49, 0x4C, 0x45, 0x3D, 0x43, 0x3A, 0x5C, 0x55, 0x02, 0x00, 0x00, 0x00, 0x43, 0x6F, 0x6D, 0x70, 0x6F, 0x73, 0x61, 0x6E, 0x74, 0x73, 0x00, 0x00, 0x73, 0x65, 0x73, 0x3D, 0x43, 0x3A, 0x5C, 0x50, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x72, 0x5C, 0x63, 0x6F, 0x6E, 0x66, 0x69, 0x67, 0x5C, 0x75, 0x73, 0x65, 0x72, 0x5F, 0x61, 0x6C, 0x02, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0xB0, 0x01, 0x00, 0x00, 0x49, 0x4E, 0x5F, 0x52, 0x01, 0x00, 0x00, 0x00, 0x53, 0x68, 0x65, 0x6D, 0x61, 0x73, 0x00, 0x00, 0x73, 0x6D, 0x65, 0x73, 0x00, 0x00, 0x00, 0x55, 0x53, 0x45, 0x52, 0x4E, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x55, 0x53, 0x45, 0x52, 0x50, 0x52, 0x4F, 0x46, 0x49, 0x4C, 0x45, 0x3D, 0x43, 0x3A, 0x5C, 0x55, 0x02, 0x00, 0x00, 0x00, 0x41, 0x75, 0x74, 0x6F, 0x6D, 0x61, 0x74, 0x69, 0x71, 0x75, 0x65, 0x00, 0x00, 0x65, 0x73, 0x3D, 0x43, 0x3A, 0x5C, 0x50, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0x5C, 0x63, 0x6F, 0x6E, 0x66, 0x69, 0x67, 0x5C, 0x75, 0x73, 0x65, 0x72, 0x5F, 0x61, 0x6C};
+size_t GEMS3_SIZE = 568;

@@ -13,7 +13,6 @@ void die(char *msg)
 
 int main(int argc, char* argv[])
 {
-    system("chcp 1254");
     system("cls");
 
     char depName[MAX];
