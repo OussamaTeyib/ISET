@@ -14,7 +14,7 @@ typedef struct
 {
     int ID;
     // +1: for the initial '\0' that terminates the string
-    // +1: for '\0' that terminates the string to remove the '\n' (or a char if the input is &gt; the buffer)
+    // +1: for '\0' that terminates the string to remove the '\n' (or a char if the input is &gt; than the buffer)
     char name[MAX_NAME + 2];
     int coeff;
     int isSpecial; // for 'stage' or 'projet'
@@ -92,6 +92,7 @@ int main(void)
 
         FILE *dep;
         Mod *mod;
+        Mod **mods;
         int nMods;
 
         switch (choice)
@@ -167,14 +168,149 @@ int main(void)
                     fwrite(&nElms, sizeof nElms, 1, dep);
                     fwrite(mod, sizeof (Mod) + sizeof (Element[mod->nElms]), 1, dep);
                     
-                    free(mod); 
+                    free(mod);
                     counter++;
                 }
   
                 fclose(dep); // must be closed in order to use it again!           
                 break;
 
-            // case 2: // modify a departement
+            case 2: // modify a departement
+                dep = fopen(dName, "rb+");
+                if (!dep)
+                    die("Cannot open the file!");
+
+                if (1 != fread(&nMods, sizeof nMods, 1, dep))
+                {
+                    printf("\nThis file is EMPTY!\n");
+                    fclose(dep);
+                    break;
+                }
+
+                mods = malloc(nMods * sizeof (Mod *));
+                for (int i = 0; i < nMods; i++)
+                {
+                    int nElms;
+                    if (1 != fread(&nElms, sizeof nElms, 1, dep))
+                        break;
+
+                    mods[i] = malloc(sizeof (Mod) + sizeof (Element[nElms]));
+                    if (!mods[i])
+                        die("Cannot allocate memory!");
+
+                    fread(mods[i], sizeof (Mod) + sizeof (Element[nElms]), 1, dep);
+                }
+
+                int modID;
+                printf("Enter the ID of the module: ");
+                do
+                {
+                    fflush(stdin);
+                    scanf("%d", &modID);
+                    if (modID <= 0 || modID > nMods)
+                    {
+                        printf("Invalid ID!\n");
+                        printf("Again: ");
+                    }
+                } while (modID <= 0 || modID > nMods);
+
+                modID--; // for indexing
+
+                printf("\nModule #%d\n", mods[modID]->ID);
+                printf("	Coeff: %d\n", mods[modID]->coeff);
+                printf("	Number of elements: %d\n", mods[modID]->nElms);
+                printf("	Elements:\n");
+
+                for (int i = 0; i < mods[modID]->nElms; i++)
+                    printf("	Element #%d: %s\n", mods[modID]->elms[i].ID, mods[modID]->elms[i].name);
+
+                int elmID;
+                printf("\nEnter the ID of the element: ");
+                do
+                {
+                    fflush(stdin);
+                    scanf("%d", &elmID);
+                    if (elmID <= 0 || elmID > mods[modID]->nElms)
+                    {
+                        printf("Invalid ID!\n");
+                        printf("Again: ");
+                    }
+                } while (elmID <= 0 || elmID > mods[modID]->nElms);
+
+                elmID--; // for indexing
+
+                printf("\nElement #%d:\n", mods[modID]->elms[elmID].ID);
+                printf("	Name: %s\n", mods[modID]->elms[elmID].name);
+                printf("	Coeff: %d\n", mods[modID]->elms[elmID].coeff);
+                printf("	Is a 'stage' or a 'projet': %s\n", mods[modID]->elms[elmID].isSpecial? "Yes": "No");
+
+                if (!mods[modID]->elms[elmID].isSpecial)
+                    printf("	Is practical: %s\n", mods[modID]->elms[elmID].isPractical? "Yes": "No");
+
+                int option; 
+                printf("\nWhat do you wanna modifie:\n");
+                printf("	1. Name\n");
+                printf("	2. Coeff\n");
+                printf("	3. Is special\n");
+                printf("	4. Is practical\n");
+                printf("	0. Nothing\n");
+                printf("Enter Your choice: ");
+                do
+                {
+                    fflush(stdin);
+                    scanf("%d", &option);
+                    if (option < 0 || option > 4)
+                        printf("ERROR!\nEnter a valid choice [0, 4]: ");
+                } while (option < 0 || option > 4);
+                        
+                switch (option)
+                {
+                    case 1:
+                        printf("\nEnter the new name: ");
+                        fflush(stdin);
+                        fgets(mods[modID]->elms[elmID].name, MAX_NAME + 2, stdin);
+                        mods[modID]->elms[elmID].name[strlen(mods[modID]->elms[elmID].name) - 1] = '\0';
+                        break;
+
+                    case 2:
+                        mods[modID]->coeff -= mods[modID]->elms[elmID].coeff;
+                        printf("Enter the new coefficient: ");
+                        fflush(stdin);
+                        scanf("%d", &mods[modID]->elms[elmID].coeff);
+                        mods[modID]->coeff += mods[modID]->elms[elmID].coeff;
+                        break;
+
+                    case 3:
+                        printf("Is this element a 'projet' or a 'stage'? (1/0): ");
+                        fflush(stdin);
+                        scanf("%d", &mods[modID]->elms[elmID].isSpecial);
+                        break;
+
+                    case 4:
+                        printf("Does this element have a 'TP'? (1/0): ");
+                        fflush(stdin);
+                        scanf("%d", &mods[modID]->elms[elmID].isPractical);
+                        break;
+
+                    case 0: 
+                        printf("Be sure the next time!\n"); // ;)
+                }
+
+                fseek(dep, sizeof nMods, SEEK_SET);
+
+                for (int i = 0; i < nMods; i++)
+                {
+                    fwrite(&mods[i]->nElms, sizeof mods[i]->nElms, 1, dep);
+                    fwrite(mods[i], sizeof (Mod) + sizeof (Element[mods[i]->nElms]), 1, dep);
+                    free(mods[i]);
+                }
+                free(mods);
+
+                if (option)
+                    printf("Done!\n");
+
+                fclose(dep);
+                break;
         
             case 3: // print the content of a departement
                 dep = fopen(dName, "rb");

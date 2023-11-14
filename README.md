@@ -18,5 +18,5 @@ Compilez le ficher à l'aide d'un compilateur (Si vous utilisez un téléphone, 
 ## Contributions
 Les contributions sont les bienvenues! N'hésitez pas à ouvrir des issues pour signaler des problèmes ou à proposer des améliorations par le biais de pull requests.
 
-## Auteurs
+## Auteur
 Votre frère [Oussama Teyib](https://facebook.com/OussamaTeyib).
