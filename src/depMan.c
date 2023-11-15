@@ -188,6 +188,9 @@ int main(void)
                 }
 
                 mods = malloc(nMods * sizeof (Mod *));
+                if (!mods)
+                    die("Cannot allocate memory!");
+
                 for (int i = 0; i < nMods; i++)
                 {
                     int nElms;
