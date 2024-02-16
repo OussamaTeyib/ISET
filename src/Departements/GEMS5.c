@@ -161,7 +161,10 @@ void printTable(Mod *mods[], int nMods, float grade)
     printf("|               |      |      |     |     |     |      |          |\n");
     printf("|    Élements   |Devoir|Examen| TP  |Note |Coeff|Module|  Mention |\n");
     printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
-    printf("|               |      |      |     |     |     |      |          |\n");
+    if (!mods[0]->elms[0].isSpecial)
+        printf("|               |      |      |     |     |     |      |          |\n");
+    else
+        printf("|               |                   |     |     |      |          |\n");
 
     for (int i = 0; i < nMods; i++)
     {
@@ -213,7 +216,10 @@ void printTable(Mod *mods[], int nMods, float grade)
             }
             else
             {
-                printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
+                if (!mods[i]->elms[j].isSpecial)
+                    printf("|_______________|______|______|_____|_____|_____|______|__________|\n");
+                else
+                    printf("|_______________|___________________|_____|_____|______|__________|\n");
             }
         }
     }
@@ -227,10 +233,7 @@ void printInfo(void)
 {
     printf(" _________________________________________________________________\n");
     printf("|                                                                 |\n");
-    printf("|         Ce programme a été écrit par Oussama Med Teyib.         |\n");
-    printf("|_________________________________________________________________|\n");
-    printf("|                                                                 |\n");
-    printf("| Le code source du projet est disponible sur:                    |\n");
+    printf("| Le code source est disponible sur:                              |\n");
     printf("| https://github.com/OussamaTeyib/ISET                            |\n");
     printf("|_________________________________________________________________|\n");
 }
