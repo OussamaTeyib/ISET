@@ -68,6 +68,6 @@ int main(int argc, char *argv[])
     fclose(dep);
     fclose(output);
 
-    printf("Done!");
+    printf("'%s.c' is created!\n", argv[1]);
     return EXIT_SUCCESS;
 }

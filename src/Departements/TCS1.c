@@ -187,7 +187,7 @@ void printTable(Mod *mods[], int nMods, float grade)
             }
 
             printf("%05.2f|", mods[i]->elms[j].note);
-            printf("  %d  |", mods[i]->elms[j].coeff);
+            printf("%s %d  |", (mods[i]->elms[j].coeff >= 10)? "": " ", mods[i]->elms[j].coeff);
 
             // if there is one or three element(s) in the module
             if (1 == mods[i]->nElms || (3 == mods[i]->nElms && j + 1 == 2))
