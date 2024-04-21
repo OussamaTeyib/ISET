@@ -17,11 +17,11 @@ all: $(DEPMAN) $(SETUP) $(DEPS) clean
 
 # compile depMan.c
 $(DEPMAN): $(DEPMAN_SRC)
-	@$(CC) $(CFLAGS) $(DEPMAN_SRC) -o bin/depMan && echo "-> 'depMan.c' is compiled successfully."
+	@$(CC) $(CFLAGS) $(DEPMAN_SRC) -o $(DEPMAN) && echo "-> 'depMan.c' is compiled successfully."
 
 # compile setup.c
 $(SETUP): $(SETUP_SRC)
-	@$(CC) $(CFLAGS) $(SETUP_SRC) -o bin/setup && echo "-> 'setup.c' is compiled successfully."
+	@$(CC) $(CFLAGS) $(SETUP_SRC) -o $(SETUP) && echo "-> 'setup.c' is compiled successfully."
 
 # update .c files or create new ones
 $(DEPS_DIR)/%.c: $(BINS_DIR)/%.bin $(MAIN)
