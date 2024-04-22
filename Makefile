@@ -27,5 +27,11 @@ $(SETUP): $(SETUP_SRC)
 $(DEPS_DIR)/%.c: $(BINS_DIR)/%.bin $(MAIN)
 	@cd bin; ./setup $(patsubst $(BINS_DIR)/%.bin, %, $<)
 
+# Push to github
+push:
+	@git add .
+	@git commit -m "$(msg)"
+	@git push origin main
+
 clean:
 	@rm -f src/Departements/*.exe
