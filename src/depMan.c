@@ -40,18 +40,16 @@ void die(char *msg)
     exit(EXIT_FAILURE);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     system("chcp 65001");
     system("cls");
 
-    char temp[MAX];
-    printf("Enter the name of the departement: ");
-    fgets(temp, MAX, stdin);
-    temp[strlen(temp) - 1] = '\0';
+    if (2 != argc)
+        die("Usage: depman <dep-name>");
 
     char dName[MAX];
-    snprintf(dName, MAX, "../res/%s.bin", temp);
+    snprintf(dName, MAX, "../res/%s.bin", argv[1]);
     
     int choice, again, firstTime = 1; // 'add' choice is given only one time.
     printf("What do you want:\n");
@@ -320,48 +318,78 @@ int main(void)
                 if (!dep)
                     die("Cannot open the file!");
 
-                if (1 == fread(&nMods, sizeof nMods, 1, dep))
-                {
-                    printf("\nNumber of modules in %s is: %d\n", temp, nMods);
-                }
-                else
+                if (1 != fread(&nMods, sizeof nMods, 1, dep))
                 {
                     printf("\nThis file is EMPTY!\n");
                     fclose(dep);
                     break;
-                }   
+                }
 
-                while (1)
+                mods = malloc(nMods * sizeof (Mod *));
+                if (!mods)
+                    die("Cannot allocate memory!");
+
+                for (int i = 0; i < nMods; i++)
                 {
                     int nElms;
                     if (1 != fread(&nElms, sizeof nElms, 1, dep))
                         break;
 
-                    mod = malloc(sizeof (Mod) + sizeof (Element[nElms]));
-                    if (!mod)
+                    mods[i] = malloc(sizeof (Mod) + sizeof (Element[nElms]));
+                    if (!mods[i])
                         die("Cannot allocate memory!");
 
-                    fread(mod, sizeof (Mod) + sizeof (Element[nElms]), 1, dep);
+                    fread(mods[i], sizeof (Mod) + sizeof (Element[nElms]), 1, dep);
+                }  
 
-                    printf("\nModule #%d\n", mod->ID);
-                    printf("	Coeff: %d\n", mod->coeff);
-                    printf("	Number of elements: %d\n", mod->nElms);
-                    printf("	Elements:\n");
+                printf(" ______________________________________________________\n");
+                printf("|   |     |                |     |         |           |\n");
+                printf("|Mod|Coeff|    Élements    |Coeff|Special? |Practical? |\n");
+                printf("|___|_____|________________|_____|_________|___________|\n");
 
-                    for (int i = 0; i < mod->nElms; i++)
+                for (int i = 0; i < nMods; i++)
+                {
+                    printf("|   |     |                |     |         |           |\n");
+                    for (int j = 0; j < mods[i]->nElms; j++)
                     {
-                        printf("	Element #%d:\n", mod->elms[i].ID);
-                        printf("		Name: %s\n", mod->elms[i].name);
-                        printf("		Coeff: %d\n", mod->elms[i].coeff);
-                        printf("		Is a 'stage' or a 'projet': %s\n", mod->elms[i].isSpecial? "Yes": "No");
+                        // if there is one or three elements in the module
+                        if (1 == mods[i]->nElms || (3 == mods[i]->nElms && j + 1 == 2))
+                        {
+                            printf("|#%d |", mods[i]->ID);
+                            printf("%s %d  |", (mods[i]->coeff >= 10)? "": " ", mods[i]->coeff);
+                        }
+                        else
+                            printf("|   |     |");
 
-                        if (!mod->elms[i].isSpecial)
-                            printf("		Is practical: %s\n", mod->elms[i].isPractical? "Yes": "No");
+                        printf(" %-*s|", MAX_NAME, mods[i]->elms[j].name);
+                        printf("%s %d  |", (mods[i]->elms[j].coeff >= 10)? "": " ", mods[i]->elms[j].coeff);
+                        // if this is a 'stage' or a 'projet'
+                        if (mods[i]->elms[j].isSpecial)
+                            printf("   YES   |     -     |\n");
+                        else
+                            printf("   NO    |    %s    |\n", mods[i]->elms[j].isPractical? "YES": "NO ");
+
+                        // if this is not the last element in the module
+                        if (j + 1 < mods[i]->nElms)
+                        {
+                            if (2 == mods[i]->nElms)
+                            {
+                                printf("|#%d |", mods[i]->ID);
+                                printf("%s %d  |", (mods[i]->coeff >= 10)? "": " ", mods[i]->coeff);
+                            }
+                            else
+                                printf("|   |     |");
+                         
+                            printf("----------------+-----+---------+-----------|\n");
+                        }
+                        else
+                            printf("|___|_____|________________|_____|_________|___________|\n");
                     }
 
-                    free(mod);
+                    free(mods[i]);
                 }
 
+                free(mods);
                 fclose(dep);
                 break;           
 
