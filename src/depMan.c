@@ -123,12 +123,12 @@ int main(int argc, char *argv[])
                     {
                         fflush(stdin);
                         scanf("%d", &nElms);
-                        if (nElms <= 0)
+                        if (nElms <= 0 || nElms > 3)
                         {
-                            printf("Number of elements can't be less than or equal to zero!\n");
+                            printf("Number of elements can't be less than 1 or more than 3!\n");
                             printf("Again: ");
                         }
-                    } while (nElms <= 0);
+                    } while (nElms <= 0  || nElms > 3);
 
                     mod = malloc(sizeof (Mod) + sizeof (Element[nElms]));
                     if (!mod)
