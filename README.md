@@ -16,3 +16,6 @@ Compilez le ficher à l'aide d'un compilateur (Si vous utilisez un téléphone A
 
 ### Contributions:
 Les contributions sont les bienvenues! N'hésitez pas à ouvrir des issues pour signaler des problèmes ou à proposer des améliorations par le biais de pull requests.
+
+### License
+This project is licensed under the GNU General Public License (GPL) version 3.0 - see the [LICENSE](LICENSE) file for details.
