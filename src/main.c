@@ -148,13 +148,15 @@ int main(void)
 
 void readNote(char *name, float *note)
 {
+    int ret;
     do
     {
         printf("%s: ", name);
-        scanf("%f", note);
-        if (*note < 0 || *note > 20)
+        fflush(stdin);
+        ret = scanf("%f", note);
+        if (*note < 0 || *note > 20 || ret != 1)
             printf("Note invalide!\n\n");
-    } while (*note < 0 || *note > 20);
+    } while (*note < 0 || *note > 20 || ret != 1);
 }
 
 void printTable(Mod *mods[], int nMods, float grade)
