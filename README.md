@@ -1,22 +1,18 @@
-# Calculateur de Moyennes des Étudiants
+## Calculateur de Moyennes des Étudiants
 
-Ce programme est réalisé dans l'espoir qu'il sera utilisé.
-Il permet de calculer les moyennes des étudiants de l'ISET et de déterminer s'ils ont validé les modules d'un semestre.
+Ce programme permet de calculer les moyennes des étudiants de l'ISET et de déterminer s'ils ont validé les modules d'un semestre.
 
-## Fonctionnalités
+### Fonctionnalité:
 - Calcul automatique des moyennes.
 - Validation des modules en fonction des critières prédéfinis.
 
-## NB
-Ce programme est fiable et bien testé (ses résultats ont été comparés aux résultats officiels).
+### NB:
+Ce programme est ***fiable*** et bien testé (ses résultats ont été comparés aux résultats ***officiels***).
 
-## L'utilisation
-Cliquez [ici](https://github.com/OussamaTeyib/ISET/tree/main/src/Departements) et téléchargez le ficher correspondant au semestre souhaité.
+### Utilisation:
+[Cliquez ici](https://github.com/OussamaTeyib/ISET/tree/main/src/Departements) et téléchargez le ficher correspondant au semestre souhaité.
 
-Compilez le ficher à l'aide d'un compilateur (Si vous utilisez un téléphone, [Cxxdroid](https://play.google.com/store/apps/details?id=ru.iiec.cxxdroid) est recommandé).
+Compilez le ficher à l'aide d'un compilateur (Si vous utilisez un téléphone Android, [Cxxdroid](https://play.google.com/store/apps/details?id=ru.iiec.cxxdroid) est recommandé).
 
-## Contributions
+### Contributions
 Les contributions sont les bienvenues! N'hésitez pas à ouvrir des issues pour signaler des problèmes ou à proposer des améliorations par le biais de pull requests.
-
-## Auteur
-Votre frère [Oussama Teyib](https://facebook.com/OussamaTeyib).
