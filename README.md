@@ -9,13 +9,15 @@ Ce programme permet de calculer les moyennes des étudiants de l'ISET et de dét
 ### NB:
 Ce programme est *fiable* et bien testé (ses résultats ont été comparés aux résultats *officiels*).
 
-### Utilisation:
-[Cliquez ici](src/Departements) et téléchargez le ficher correspondant au semestre souhaité.
+### Installation
+Pour utiliser ce projet, suivez ces étapes :
 
-Compilez le ficher à l'aide d'un compilateur (Si vous utilisez un téléphone Android, [Cxxdroid](https://play.google.com/store/apps/details?id=ru.iiec.cxxdroid) est recommandé).
+1. Téléchargez la dernière version depuis la page [Releases](https://github.com/OussamaTeyib/ISET/releases).
+2. Décompressez le fichier téléchargé dans l'emplacement souhaité sur votre ordinateur.
+3. Compilez les fichers des départements à l'aide d'un compilateur (Si vous utilisez un téléphone Android, [Cxxdroid](https://play.google.com/store/apps/details?id=ru.iiec.cxxdroid) est recommandé).
 
 ### Contributions:
 Les contributions sont les bienvenues! N'hésitez pas à ouvrir des issues pour signaler des problèmes ou à proposer des améliorations par le biais de pull requests.
 
-### License
-This project is licensed under the GNU General Public License (GPL) version 3.0 - see the [LICENSE](LICENSE) file for details.
+### Licence
+Ce projet est sous licence GNU General Public License (GPL) version 3.0 - consultez le fichier [LICENSE](LICENSE) pour plus de détails.
