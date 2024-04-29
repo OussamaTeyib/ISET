@@ -7,7 +7,7 @@ SETUP = bin/setup.exe
 SETUP_SRC = src/setup.c 
 
 BINS_DIR = res
-DEPS_DIR = src/Departements
+DEPS_DIR = Departements
 BINS = $(wildcard $(BINS_DIR)/*.bin)
 DEPS = $(patsubst $(BINS_DIR)/%.bin, $(DEPS_DIR)/%.c, $(BINS))
 
@@ -33,7 +33,7 @@ $(DEPS_DIR)/%.c: $(BINS_DIR)/%.bin $(MAIN)
 # Zip departements files
 zip:
 	@mkdir -p $(RELEASE_DIR)
-	@7z a $(RELEASE_DIR)/ISET-v$(ver).zip $(DEPS_DIR)/*
+	@cd src; 7z a -tzip ../$(RELEASE_DIR)/ISET-$(ver).zip $(DEPS_DIR)/*
 
 # Push to github
 push:
@@ -43,10 +43,10 @@ push:
 
 # Publish a release
 release:
-	@git tag -a v$(ver) -m "Release v$(ver)"
-	@git push origin v$(ver)
-	@gh release create v$(ver)
-	@gh release upload v$(ver) $(RELEASE_DIR)/ISET-v$(ver).zip
+	@git tag -a $(ver) -m "Release $(ver)"
+	@git push origin $(ver)
+	@gh release create $(ver)
+	@gh release upload $(ver) $(RELEASE_DIR)/ISET-$(ver).zip
 
 clean:
 	@rm -f src/Departements/*.exe
