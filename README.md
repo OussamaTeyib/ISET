@@ -3,6 +3,7 @@
 Ce programme permet de calculer les moyennes des étudiants de l'ISET et de déterminer s'ils ont validé les modules d'un semestre.
 
 ### Fonctionnalité:
+
 - Calcul automatique des moyennes.
 - Validation des modules en fonction des critières prédéfinis.
 
