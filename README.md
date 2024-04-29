@@ -20,4 +20,4 @@ Pour utiliser ce projet, suivez ces étapes :
 Les contributions sont les bienvenues! N'hésitez pas à ouvrir des issues pour signaler des problèmes ou à proposer des améliorations par le biais de pull requests.
 
 ### Licence
-Ce projet est sous licence GNU General Public License (GPL) version 3.0 - consultez le fichier LICENSE (en [Anglais](LICENSE_en) ou en [Français](LICENSE_fr)) pour plus de détails.
+Ce projet est sous licence GNU General Public License (GPL) version 3.0 - consultez le fichier [LICENSE](LICENSE) pour plus de détails.
