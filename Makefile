@@ -33,7 +33,7 @@ $(DEPS_DIR)/%.c: $(BINS_DIR)/%.bin $(MAIN)
 # Zip departements files
 zip:
 	@mkdir -p $(RELEASE_DIR)
-	@7z a $(RELEASE_DIR)/ISET-v$(v).zip $(DEPS_DIR)/*
+	@7z a $(RELEASE_DIR)/ISET-v$(ver).zip $(DEPS_DIR)/*
 
 # Push to github
 push:
@@ -43,6 +43,10 @@ push:
 
 # Publish a release
 release:
+	@git tag -a v$(ver) -m "Release v$(ver)"
+	@git push origin v$(ver)
+	@gh release create v$(ver)
+	@gh release upload v$(ver) $(RELEASE_DIR)/ISET-v$(ver).zip
 
 clean:
 	@rm -f src/Departements/*.exe
