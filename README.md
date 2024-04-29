@@ -10,7 +10,7 @@ Ce programme permet de calculer les moyennes des étudiants de l'ISET et de dét
 Ce programme est *fiable* et bien testé (ses résultats ont été comparés aux résultats *officiels*).
 
 ### Utilisation:
-[Cliquez ici](https://github.com/OussamaTeyib/ISET/tree/main/src/Departements) et téléchargez le ficher correspondant au semestre souhaité.
+[Cliquez ici](src/Departements) et téléchargez le ficher correspondant au semestre souhaité.
 
 Compilez le ficher à l'aide d'un compilateur (Si vous utilisez un téléphone Android, [Cxxdroid](https://play.google.com/store/apps/details?id=ru.iiec.cxxdroid) est recommandé).
 
