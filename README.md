@@ -10,7 +10,7 @@ Ce programme permet de calculer les moyennes des étudiants de l'ISET et de dét
 Ce programme est *fiable* et bien testé (ses résultats ont été comparés aux résultats *officiels*).
 
 ### Installation:
-Pour utiliser ce projet, suivez ces étapes:
+Pour utiliser ce programme, suivez ces étapes:
 
 1. Téléchargez la dernière version depuis la page [Releases](https://github.com/OussamaTeyib/ISET/releases).
 2. Décompressez le fichier téléchargé dans l'emplacement souhaité sur votre ordinateur.
@@ -19,5 +19,5 @@ Pour utiliser ce projet, suivez ces étapes:
 ### Contributions:
 Les contributions sont les bienvenues! N'hésitez pas à ouvrir des issues pour signaler des problèmes ou à proposer des améliorations par le biais de pull requests.
 
-### Licence
+### Licence:
 Ce projet est sous licence MIT License - consultez le fichier [LICENSE](LICENSE) pour plus de détails.
