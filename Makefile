@@ -28,7 +28,7 @@ $(SETUP): $(SETUP_SRC)
 $(DEPS_DIR)/%.c: $(BINS_DIR)/%.bin $(MAIN)
 	@cd bin; ./setup $(patsubst $(BINS_DIR)/%.bin, %, $<)
 
-.PHONY: zip  push release clean
+.PHONY: zip push release clean
 
 # Zip departements files
 zip:
