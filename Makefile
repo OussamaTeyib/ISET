@@ -12,6 +12,7 @@ BINS = $(wildcard $(BINS_DIR)/*.bin)
 DEPS = $(patsubst $(BINS_DIR)/%.bin, $(DEPS_DIR)/%.c, $(BINS))
 
 MAIN = src/main.c
+RELEASE_DIR = release
 
 all: $(DEPMAN) $(SETUP) $(DEPS) clean
 
@@ -27,13 +28,21 @@ $(SETUP): $(SETUP_SRC)
 $(DEPS_DIR)/%.c: $(BINS_DIR)/%.bin $(MAIN)
 	@cd bin; ./setup $(patsubst $(BINS_DIR)/%.bin, %, $<)
 
-.PHONY: push clean
+.PHONY: zip  push release clean
+
+# Zip departements files
+zip:
+	@mkdir -p $(RELEASE_DIR)
+	@7z a $(RELEASE_DIR)/ISET-v$(v).zip $(DEPS_DIR)/*
 
 # Push to github
 push:
 	@git add .
 	@git commit -m "$(msg)"
 	@git push origin main
+
+# Publish a release
+release:
 
 clean:
 	@rm -f src/Departements/*.exe
