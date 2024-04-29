@@ -40,6 +40,7 @@ void die(char *msg)
 
 void printTable(Mod *mods[], int nMods, float grade);
 void printInfo(void);
+void readNote(char *name, float *note);
 
 int main(void)
 {
@@ -88,14 +89,12 @@ int main(void)
             }
 
             printf("Saisir la note de '%s':\n", mods[i]->elms[j].name);
-            printf("Devoir: ");
-            scanf("%f", &mods[i]->elms[j].dev);
-            printf("Examen: ");
-            scanf("%f", &mods[i]->elms[j].ex);
+            readNote("Devoir", &mods[i]->elms[j].dev);
+            readNote("Examen", &mods[i]->elms[j].ex);
+
             if (mods[i]->elms[j].isPractical)
             {
-                printf("TP: ");
-                scanf("%f", &mods[i]->elms[j].TP);
+                readNote("TP", &mods[i]->elms[j].TP);
                 mods[i]->elms[j].note = (mods[i]->elms[j].ex * 3 + mods[i]->elms[j].dev * 2 + mods[i]->elms[j].TP) / 6;
             }
             else
@@ -153,6 +152,17 @@ int main(void)
     fclose(dep); 
     remove("temp.bin");
     return EXIT_SUCCESS;    
+}
+
+void readNote(char *name, float *note)
+{
+    do
+    {
+        printf("%s: ", name);
+        scanf("%f", note);
+        if (*note < 0 || *note > 20)
+            printf("Note invalide!\n\n");
+    } while (*note < 0 || *note > 20);
 }
 
 void printTable(Mod *mods[], int nMods, float grade)
