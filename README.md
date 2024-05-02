@@ -13,7 +13,7 @@ Ce programme est *fiable* et bien testé (ses résultats ont été comparés aux
 Pour utiliser ce programme, suivez ces étapes:
 
 1. Téléchargez la dernière version depuis la page [Releases](https://github.com/OussamaTeyib/ISET/releases).
-2. Décompressez le fichier téléchargé dans l'emplacement souhaité sur votre ordinateur.
+2. Décompressez le fichier téléchargé.
 3. Compilez les fichers des départements à l'aide d'un compilateur (Si vous utilisez un téléphone Android, [Cxxdroid](https://play.google.com/store/apps/details?id=ru.iiec.cxxdroid) est recommandé).
 
 ### Contributions:
